@@ -1,0 +1,22 @@
+{
+  "name": "@streetlight/cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv --include-runtime false worker-configuration.d.ts",
+    "check": "yarn cf-typegen && yarn typecheck && yarn test",
+    "check:tenant-isolation": "tsx scripts/check-tenant-isolation.ts",
+    "deploy": "tsx scripts/deploy.ts",
+    "deploy:dry-run": "tsx scripts/deploy.ts --dry-run",
+    "test": "tsx --test src/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261006.1",
+    "@types/node": "^24.0.0",
+    "jsonc-parser": "^3.3.1",
+    "tsx": "^4.17.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.151.0"
+  }
+}

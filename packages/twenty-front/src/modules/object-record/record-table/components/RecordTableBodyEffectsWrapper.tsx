@@ -1,0 +1,42 @@
+import { RecordTableDeactivateRecordTableRowEffect } from '@/object-record/record-table/components/RecordTableDeactivateRecordTableRowEffect';
+import { RecordTableEmptyHasNewRecordEffect } from '@/object-record/record-table/components/RecordTableEmptyHasNewRecordEffect';
+import { RecordSelectionEscapeHotkeyEffect } from '@/object-record/record-selection/components/RecordSelectionEscapeHotkeyEffect';
+import { RecordTableBodyFocusClickOutsideEffect } from '@/object-record/record-table/record-table-body/components/RecordTableBodyFocusClickOutsideEffect';
+import { RecordTableBodyFocusKeyboardEffect } from '@/object-record/record-table/record-table-body/components/RecordTableBodyFocusKeyboardEffect';
+import { RecordTableRecordGroupBodyEffects } from '@/object-record/record-table/record-table-body/components/RecordTableRecordGroupBodyEffects';
+import { RecordTableRecordGroupsSSESubscribeEffect } from '@/object-record/record-table/record-table-body/components/RecordTableRecordGroupsSSESubscribeEffect';
+import { RecordTableNoRecordGroupScrollToPreviousRecordEffect } from '@/object-record/record-table/virtualization/components/RecordTableNoRecordGroupScrollToPreviousRecordEffect';
+import { RecordTableVirtualizedFieldMetadataUpdateEffect } from '@/object-record/record-table/virtualization/components/RecordTableVirtualizedFieldMetadataUpdateEffect';
+import { RecordTableVirtualizedInitialDataLoadEffect } from '@/object-record/record-table/virtualization/components/RecordTableVirtualizedInitialDataLoadEffect';
+
+export interface RecordTableBodyEffectsWrapperProps {
+  hasRecordGroups: boolean;
+  tableBodyRef: React.RefObject<HTMLDivElement | null>;
+}
+
+export const RecordTableBodyEffectsWrapper = ({
+  hasRecordGroups,
+  tableBodyRef,
+}: RecordTableBodyEffectsWrapperProps) => {
+  return (
+    <>
+      {hasRecordGroups ? (
+        <>
+          <RecordTableRecordGroupBodyEffects />
+          <RecordTableRecordGroupsSSESubscribeEffect />
+        </>
+      ) : (
+        <>
+          <RecordTableEmptyHasNewRecordEffect />
+          <RecordTableNoRecordGroupScrollToPreviousRecordEffect />
+          <RecordTableVirtualizedInitialDataLoadEffect />
+          <RecordTableVirtualizedFieldMetadataUpdateEffect />
+        </>
+      )}
+      <RecordSelectionEscapeHotkeyEffect />
+      <RecordTableBodyFocusKeyboardEffect />
+      <RecordTableBodyFocusClickOutsideEffect tableBodyRef={tableBodyRef} />
+      <RecordTableDeactivateRecordTableRowEffect />
+    </>
+  );
+};

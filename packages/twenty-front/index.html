@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en" translate="no" class="light">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="icon" href="/images/brand/favicon.ico" sizes="48x48" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/images/brand/favicon.svg"
+      data-rh="true"
+    />
+    <link rel="apple-touch-icon" href="/images/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <meta name="theme-color" content="#1b2b4b" />
+    <meta name="application-name" content="Streetlight CRM" />
+    <meta name="apple-mobile-web-app-title" content="Streetlight CRM" />
+    <meta
+      name="description"
+      content="Streetlight CRM — a private nonprofit CRM built on Twenty"
+    />
+    <meta
+      property="og:image"
+      content="/images/brand/streetlight-crm-link-preview.png"
+    />
+    <meta
+      property="og:description"
+      content="A private nonprofit CRM built on Twenty"
+    />
+    <meta property="og:title" content="Streetlight CRM" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="/images/brand/streetlight-crm-link-preview.png"
+    />
+
+    <meta
+      name="twitter:description"
+      content="A private nonprofit CRM built on Twenty"
+    />
+    <meta name="twitter:title" content="Streetlight CRM" />
+    <title>Streetlight CRM</title>
+    <!-- BEGIN: Twenty Config -->
+    <script id="twenty-env-config">
+      window._env_ = {
+        // This will be overwritten
+      };
+    </script>
+    <!-- END: Twenty Config -->
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+    />
+    <script type="module">
+      const disableInputAutoZoom = () => {
+        const viewportMetadata = document.querySelector('meta[name=viewport]');
+
+        if (viewportMetadata !== null) {
+          viewportMetadata.setAttribute(
+            'content',
+            'width=device-width, initial-scale=1.0, maximum-scale=1.0, interactive-widget=resizes-content',
+          );
+        }
+      };
+
+      const isIOS = /iPad|iPhone/.test(navigator.userAgent);
+      if (isIOS) {
+        disableInputAutoZoom();
+      }
+    </script>
+    <style>
+      /* react-data-grid declares its layer when it loads; keep it below twenty-ui. */
+      @layer rdg, twenty-ui;
+
+      :root {
+        --theme-dark-background-secondary: #1c1c1e;
+        --theme-light-background-secondary: #f5f5f7;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background-color: var(--theme-dark-background-secondary);
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        html,
+        body {
+          background-color: var(--theme-light-background-secondary);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

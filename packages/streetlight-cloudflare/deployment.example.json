@@ -1,0 +1,8 @@
+{
+  "accountId": "00000000000000000000000000000000",
+  "hostname": "crm.organization.example",
+  "sourceUrl": "https://github.com/ORGANIZATION/REPOSITORY/commit/0000000000000000000000000000000000000000",
+  "tenantSlug": "organization",
+  "zoneId": "00000000000000000000000000000000",
+  "zoneName": "organization.example"
+}

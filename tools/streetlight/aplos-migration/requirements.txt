@@ -1,0 +1,3 @@
+# Aplos token is base64 RSA-encrypted (RSA/ECB/PKCS1Padding, PKCS#8 key).
+# cryptography handles the decrypt; everything else uses the stdlib (urllib).
+cryptography>=42.0

@@ -1,0 +1,56 @@
+name: streetlight-crm
+
+x-streetlight-app: &streetlight-app
+  image: ${STREETLIGHT_IMAGE:?Set STREETLIGHT_IMAGE to an immutable image tag or digest}
+  env_file:
+    - ${STREETLIGHT_ENV_FILE:-production.env}
+  volumes:
+    - streetlight-local-storage:/app/packages/twenty-server/.local-storage
+  restart: unless-stopped
+
+services:
+  server:
+    <<: *streetlight-app
+    environment:
+      NODE_PORT: 3000
+      DISABLE_DB_MIGRATIONS: "false"
+      DISABLE_CRON_JOBS_REGISTRATION: "false"
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    <<: *streetlight-app
+    command: ["yarn", "worker:prod"]
+    environment:
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+    depends_on:
+      server:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      STREETLIGHT_DOMAIN: ${STREETLIGHT_DOMAIN:?Set STREETLIGHT_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  streetlight-local-storage:
+  caddy-data:
+  caddy-config:

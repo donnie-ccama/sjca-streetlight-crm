@@ -1,0 +1,24 @@
+{
+  "short_name": "Streetlight",
+  "name": "Streetlight CRM",
+  "description": "A private nonprofit CRM built on Twenty",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#1b2b4b",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/images/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

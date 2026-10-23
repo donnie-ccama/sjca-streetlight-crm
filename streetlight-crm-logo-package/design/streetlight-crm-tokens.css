@@ -1,0 +1,98 @@
+/* Streetlight CRM: design tokens
+   Paste this into your app's main stylesheet (or link it first) and use the
+   variables everywhere, e.g.  color: var(--sl-text);  background: var(--sl-brand);
+   Fonts: load Inter and Inter Tight from Google Fonts (see README). */
+
+:root {
+  /* ---- Brand ---- */
+  --sl-navy: #1b2b4b;          /* logo, sidebar, primary dark surface */
+  --sl-navy-hover: #24375e;    /* hover state on navy */
+  --sl-red: #e0322d;           /* the lamp; ONE primary action per screen */
+  --sl-red-hover: #c62a25;
+  --sl-on-red: #ffffff;
+  --sl-on-navy: #ffffff;
+  --sl-on-navy-muted: #c9d1e3; /* inactive sidebar links */
+
+  /* ---- Neutrals ---- */
+  --sl-bg: #ffffff;
+  --sl-surface: #f5f5f7;       /* page behind cards, panels */
+  --sl-text: #1d1d1f;
+  --sl-text-secondary: #6e6e73;/* 4.9:1 on white; passes for small text */
+  --sl-hairline: #ececec;      /* row dividers */
+  --sl-hairline-strong: #c7c7cc;/* input borders */
+
+  /* ---- Status (for tags, alerts) ---- */
+  --sl-info: #2f6df0;
+  --sl-success: #11805f;
+  --sl-warning: #b35c00;
+  --sl-danger: #c62a25;
+
+  /* ---- Type ---- */
+  --sl-font-display: "Inter Tight", "Inter", system-ui, sans-serif; /* headings */
+  --sl-font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; /* everything else */
+  --sl-text-xs: 0.75rem;   /* 12px labels, uppercase + 0.075em tracking */
+  --sl-text-sm: 0.875rem;  /* 14px secondary UI */
+  --sl-text-md: 1rem;      /* 16px body / inputs */
+  --sl-text-lg: 1.25rem;   /* 20px card titles */
+  --sl-text-xl: 1.875rem;  /* 30px page titles */
+  --sl-text-2xl: 2.5rem;   /* 40px dashboard numbers */
+
+  /* ---- Space (4px steps) ---- */
+  --sl-space-1: 0.25rem;
+  --sl-space-2: 0.5rem;
+  --sl-space-3: 0.75rem;
+  --sl-space-4: 1rem;
+  --sl-space-5: 1.5rem;
+  --sl-space-6: 2rem;
+  --sl-space-7: 2.5rem;
+  --sl-space-8: 3.5rem;
+
+  /* ---- Shape ---- */
+  --sl-radius-sm: 10px;    /* nav items, thumbnails */
+  --sl-radius: 14px;       /* cards, panels */
+  --sl-radius-pill: 999px; /* buttons and inputs: pressable things are pills */
+  --sl-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --sl-shadow-float: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --sl-focus: 2px solid var(--sl-info);
+}
+
+/* Dark mode: follows the user's device setting */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sl-red: #ff4d47;
+    --sl-red-hover: #ff6a65;
+    --sl-on-red: #000000;      /* black on the brighter red reads better than white */
+    --sl-bg: #000000;
+    --sl-surface: #1c1c1e;
+    --sl-text: #f5f5f7;
+    --sl-text-secondary: #98989d;
+    --sl-hairline: #2c2c2e;
+    --sl-hairline-strong: #3a3a3c;
+    --sl-info: #5b8cff;
+    --sl-success: #3bc79a;
+    --sl-warning: #ff9d3d;
+    --sl-danger: #ff6a65;
+  }
+}
+
+/* ---- A few ready-made pieces ---- */
+body { margin: 0; background: var(--sl-surface); color: var(--sl-text); font-family: var(--sl-font-ui); font-size: var(--sl-text-md); line-height: 1.5; }
+h1, h2, h3 { font-family: var(--sl-font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin: 0; }
+h1 { font-size: var(--sl-text-xl); }
+h2 { font-size: var(--sl-text-lg); }
+
+.sl-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--sl-space-5); border-radius: var(--sl-radius-pill); border: 1px solid transparent; font: 600 var(--sl-text-md)/1 var(--sl-font-ui); cursor: pointer; text-decoration: none; }
+.sl-btn--primary { background: var(--sl-red); color: var(--sl-on-red); }
+.sl-btn--primary:hover { background: var(--sl-red-hover); }
+.sl-btn--secondary { background: var(--sl-navy); color: var(--sl-on-navy); }
+.sl-btn--secondary:hover { background: var(--sl-navy-hover); }
+.sl-btn--ghost { background: transparent; color: var(--sl-text); border-color: var(--sl-hairline-strong); }
+.sl-btn:focus-visible, .sl-input:focus-visible { outline: var(--sl-focus); outline-offset: 2px; }
+
+.sl-input { min-height: 44px; padding: 0 var(--sl-space-4); border-radius: var(--sl-radius-pill); border: 1px solid var(--sl-hairline-strong); background: var(--sl-bg); color: var(--sl-text); font: inherit; }
+.sl-card { background: var(--sl-bg); border-radius: var(--sl-radius); box-shadow: var(--sl-shadow-card); padding: var(--sl-space-6); }
+.sl-label { font-size: var(--sl-text-xs); font-weight: 700; letter-spacing: 0.075em; text-transform: uppercase; color: var(--sl-text-secondary); }
+
+.sl-sidebar { background: var(--sl-navy); color: var(--sl-on-navy); padding: var(--sl-space-6) var(--sl-space-5); }
+.sl-sidebar a { display: block; padding: 11px 14px; border-radius: var(--sl-radius-sm); color: var(--sl-on-navy-muted); text-decoration: none; font-weight: 500; }
+.sl-sidebar a:hover, .sl-sidebar a[aria-current="page"] { background: rgba(255, 255, 255, 0.12); color: var(--sl-on-navy); }

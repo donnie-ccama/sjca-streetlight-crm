@@ -1,0 +1,19 @@
+import type { ExtendedUIMessage } from 'twenty-shared/ai';
+
+import type { BrowsingContextType } from 'src/engine/metadata-modules/ai/ai-agent/types/browsing-context.type';
+
+export type StreamAgentChatJobData = {
+  threadId: string;
+  streamId: string;
+  userWorkspaceId: string;
+  workspaceId: string;
+  messages: ExtendedUIMessage[];
+  browsingContext: BrowsingContextType | null;
+  modelId?: string;
+  lastUserMessageText: string;
+  hasTitle: boolean;
+  existingTurnId: string;
+  // absent on a turn that has no message of its own, such as a resume after an answer
+  messageId?: string;
+  conversationSizeTokens: number;
+};

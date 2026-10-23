@@ -1,0 +1,91 @@
+import { defineObject, FieldType } from 'twenty-sdk/define';
+
+import {
+  ACTIVE_DONORS_90D_FIELD_UID,
+  AVG_GIFT_FIELD_UID,
+  COMPANY_DONORS_YTD_FIELD_UID,
+  COMPUTED_AT_FIELD_UID,
+  DASHBOARD_SNAPSHOT_OBJECT_UID,
+  INDIVIDUAL_DONORS_YTD_FIELD_UID,
+  LAPSED_COUNT_FIELD_UID,
+  SNAPSHOT_KEY_FIELD_UID,
+  YTD_DONORS_FIELD_UID,
+  YTD_GIVING_FIELD_UID,
+} from 'src/constants/dashboard-identifiers';
+
+export default defineObject({
+  universalIdentifier: DASHBOARD_SNAPSHOT_OBJECT_UID,
+  nameSingular: 'dashboardSnapshot',
+  namePlural: 'dashboardSnapshots',
+  labelSingular: 'Dashboard Snapshot',
+  labelPlural: 'Dashboard Snapshots',
+  description: 'Hourly computed nonprofit giving metrics',
+  icon: 'IconGauge',
+  labelIdentifierFieldMetadataUniversalIdentifier: SNAPSHOT_KEY_FIELD_UID,
+  fields: [
+    {
+      universalIdentifier: SNAPSHOT_KEY_FIELD_UID,
+      type: FieldType.TEXT,
+      name: 'snapshotKey',
+      label: 'Snapshot Key',
+      icon: 'IconKey',
+      isUnique: true,
+    },
+    {
+      universalIdentifier: COMPUTED_AT_FIELD_UID,
+      type: FieldType.DATE_TIME,
+      name: 'computedAt',
+      label: 'Computed At',
+      icon: 'IconClock',
+    },
+    {
+      universalIdentifier: YTD_DONORS_FIELD_UID,
+      type: FieldType.NUMBER,
+      name: 'ytdDonors',
+      label: 'YTD Donors',
+      icon: 'IconUsers',
+    },
+    {
+      universalIdentifier: INDIVIDUAL_DONORS_YTD_FIELD_UID,
+      type: FieldType.NUMBER,
+      name: 'individualDonorsYtd',
+      label: 'Individual Donors YTD',
+      icon: 'IconUser',
+    },
+    {
+      universalIdentifier: COMPANY_DONORS_YTD_FIELD_UID,
+      type: FieldType.NUMBER,
+      name: 'companyDonorsYtd',
+      label: 'Company Donors YTD',
+      icon: 'IconBuilding',
+    },
+    {
+      universalIdentifier: ACTIVE_DONORS_90D_FIELD_UID,
+      type: FieldType.NUMBER,
+      name: 'activeDonors90d',
+      label: 'Active Donors (90d)',
+      icon: 'IconUserCheck',
+    },
+    {
+      universalIdentifier: LAPSED_COUNT_FIELD_UID,
+      type: FieldType.NUMBER,
+      name: 'lapsedDonorCount',
+      label: 'Lapsed Donors',
+      icon: 'IconUserPause',
+    },
+    {
+      universalIdentifier: YTD_GIVING_FIELD_UID,
+      type: FieldType.CURRENCY,
+      name: 'ytdGiving',
+      label: 'YTD Giving',
+      icon: 'IconCurrencyDollar',
+    },
+    {
+      universalIdentifier: AVG_GIFT_FIELD_UID,
+      type: FieldType.CURRENCY,
+      name: 'avgGift',
+      label: 'Average Gift',
+      icon: 'IconCurrencyDollar',
+    },
+  ],
+});

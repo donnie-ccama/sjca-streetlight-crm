@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "rufloVersion": "3.59.17",
+  "policyMode": "observe",
+  "swarm": {
+    "topology": "hierarchical",
+    "strategy": "specialized",
+    "maxAgents": 4
+  },
+  "ownership": {
+    "writersPerWorktree": 1,
+    "sharedCheckoutRoles": ["researcher", "reviewer", "tester-read-only"]
+  },
+  "releaseAuthority": {
+    "automaticCommit": false,
+    "automaticPush": false,
+    "automaticDeploy": false,
+    "automaticPublish": false,
+    "automaticSpend": false
+  },
+  "requiredEvidence": [
+    "exact-source-state",
+    "focused-tests",
+    "integration-checks",
+    "security-scan",
+    "independent-read-only-review"
+  ]
+}

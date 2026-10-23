@@ -1,0 +1,58 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "tenant-streetlight-crm",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-23",
+  "upload_source_maps": true,
+  "workers_dev": false,
+  "vars": {
+    "STREETLIGHT_SOURCE_REVISION": "0000000000000000000000000000000000000000",
+    "STREETLIGHT_SOURCE_URL": "https://example.invalid/streetlight-crm/commit/0000000000000000000000000000000000000000",
+    "STREETLIGHT_TENANT_SLUG": "tenant",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "triggers": {
+    "crons": ["*/5 * * * *"],
+  },
+  "containers": [
+    {
+      "class_name": "StreetlightContainer",
+      "scheduling_policy": "durable_object",
+      "images": {
+        "streetlight": {
+          "dockerfile": "../twenty-docker/twenty/Dockerfile",
+          "build_context": "../..",
+          "build_vars": {
+            "APP_VERSION": "tenant-cloudflare",
+            "SOURCE_REVISION": "0000000000000000000000000000000000000000",
+            "SOURCE_URL": "https://example.invalid/streetlight-crm/commit/0000000000000000000000000000000000000000",
+          },
+        },
+      },
+      "observability": {
+        "logs": {
+          "enabled": true,
+        },
+      },
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "STREETLIGHT_CONTAINER",
+        "class_name": "StreetlightContainer",
+      },
+    ],
+  },
+  "exports": {
+    "StreetlightContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+  },
+  "secrets": {
+    "required": ["STREETLIGHT_RUNTIME_ENV_JSON"],
+  },
+}

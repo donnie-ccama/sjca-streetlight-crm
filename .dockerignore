@@ -1,0 +1,10 @@
+.git
+.env
+**/node_modules
+.nx/cache
+packages/twenty-server/.env
+packages/streetlight-cloudflare/deployment.json
+packages/streetlight-cloudflare/runtime-env.json
+packages/streetlight-cloudflare/wrangler.deploy-*.json
+packages/streetlight-cloudflare/tenants/*/deployment.json
+packages/streetlight-cloudflare/tenants/*/runtime-env.json

@@ -40,6 +40,9 @@ jobs:
           corepack enable
           corepack yarn install --immutable
 
+      - name: Validate the Cloudflare deployment package
+        run: corepack yarn streetlight:cloudflare:check
+
       - name: Materialize ignored deployment configuration
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
@@ -91,9 +94,6 @@ jobs:
             { mode: 0o600 },
           );
           NODE
-
-      - name: Validate the Cloudflare deployment package
-        run: corepack yarn streetlight:cloudflare:check
 
       - name: Deploy with Wrangler
         env:

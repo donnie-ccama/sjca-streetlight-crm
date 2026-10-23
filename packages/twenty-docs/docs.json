@@ -1084,17 +1084,6 @@
                     ]
                   },
                   {
-                    "group": "Données",
-                    "pages": [
-                      "fr/developers/extend/apps/data/overview",
-                      "fr/developers/extend/apps/data/objects",
-                      "fr/developers/extend/apps/data/extending-objects",
-                      "fr/developers/extend/apps/data/system-fields",
-                      "fr/developers/extend/apps/data/relations",
-                      "fr/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Logique",
                     "pages": [
                       "fr/developers/extend/apps/logic/overview",
@@ -1544,17 +1533,6 @@
                       "ar/developers/extend/apps/config/roles",
                       "ar/developers/extend/apps/config/install-hooks",
                       "ar/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "بيانات",
-                    "pages": [
-                      "ar/developers/extend/apps/data/overview",
-                      "ar/developers/extend/apps/data/objects",
-                      "ar/developers/extend/apps/data/extending-objects",
-                      "ar/developers/extend/apps/data/system-fields",
-                      "ar/developers/extend/apps/data/relations",
-                      "ar/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {
@@ -2010,17 +1988,6 @@
                     ]
                   },
                   {
-                    "group": "Data",
-                    "pages": [
-                      "cs/developers/extend/apps/data/overview",
-                      "cs/developers/extend/apps/data/objects",
-                      "cs/developers/extend/apps/data/extending-objects",
-                      "cs/developers/extend/apps/data/system-fields",
-                      "cs/developers/extend/apps/data/relations",
-                      "cs/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Logika",
                     "pages": [
                       "cs/developers/extend/apps/logic/overview",
@@ -2470,17 +2437,6 @@
                       "de/developers/extend/apps/config/roles",
                       "de/developers/extend/apps/config/install-hooks",
                       "de/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "Daten",
-                    "pages": [
-                      "de/developers/extend/apps/data/overview",
-                      "de/developers/extend/apps/data/objects",
-                      "de/developers/extend/apps/data/extending-objects",
-                      "de/developers/extend/apps/data/system-fields",
-                      "de/developers/extend/apps/data/relations",
-                      "de/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {
@@ -2936,17 +2892,6 @@
                     ]
                   },
                   {
-                    "group": "Datos",
-                    "pages": [
-                      "es/developers/extend/apps/data/overview",
-                      "es/developers/extend/apps/data/objects",
-                      "es/developers/extend/apps/data/extending-objects",
-                      "es/developers/extend/apps/data/system-fields",
-                      "es/developers/extend/apps/data/relations",
-                      "es/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Lógica",
                     "pages": [
                       "es/developers/extend/apps/logic/overview",
@@ -3396,17 +3341,6 @@
                       "it/developers/extend/apps/config/roles",
                       "it/developers/extend/apps/config/install-hooks",
                       "it/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "Dati",
-                    "pages": [
-                      "it/developers/extend/apps/data/overview",
-                      "it/developers/extend/apps/data/objects",
-                      "it/developers/extend/apps/data/extending-objects",
-                      "it/developers/extend/apps/data/system-fields",
-                      "it/developers/extend/apps/data/relations",
-                      "it/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {
@@ -3862,17 +3796,6 @@
                     ]
                   },
                   {
-                    "group": "データ",
-                    "pages": [
-                      "ja/developers/extend/apps/data/overview",
-                      "ja/developers/extend/apps/data/objects",
-                      "ja/developers/extend/apps/data/extending-objects",
-                      "ja/developers/extend/apps/data/system-fields",
-                      "ja/developers/extend/apps/data/relations",
-                      "ja/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "ロジック",
                     "pages": [
                       "ja/developers/extend/apps/logic/overview",
@@ -4322,17 +4245,6 @@
                       "ko/developers/extend/apps/config/roles",
                       "ko/developers/extend/apps/config/install-hooks",
                       "ko/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "데이터",
-                    "pages": [
-                      "ko/developers/extend/apps/data/overview",
-                      "ko/developers/extend/apps/data/objects",
-                      "ko/developers/extend/apps/data/extending-objects",
-                      "ko/developers/extend/apps/data/system-fields",
-                      "ko/developers/extend/apps/data/relations",
-                      "ko/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {
@@ -4788,17 +4700,6 @@
                     ]
                   },
                   {
-                    "group": "Dados",
-                    "pages": [
-                      "pt/developers/extend/apps/data/overview",
-                      "pt/developers/extend/apps/data/objects",
-                      "pt/developers/extend/apps/data/extending-objects",
-                      "pt/developers/extend/apps/data/system-fields",
-                      "pt/developers/extend/apps/data/relations",
-                      "pt/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Lógica",
                     "pages": [
                       "pt/developers/extend/apps/logic/overview",
@@ -5248,17 +5149,6 @@
                       "ro/developers/extend/apps/config/roles",
                       "ro/developers/extend/apps/config/install-hooks",
                       "ro/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "Date",
-                    "pages": [
-                      "ro/developers/extend/apps/data/overview",
-                      "ro/developers/extend/apps/data/objects",
-                      "ro/developers/extend/apps/data/extending-objects",
-                      "ro/developers/extend/apps/data/system-fields",
-                      "ro/developers/extend/apps/data/relations",
-                      "ro/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {
@@ -5714,17 +5604,6 @@
                     ]
                   },
                   {
-                    "group": "Данные",
-                    "pages": [
-                      "ru/developers/extend/apps/data/overview",
-                      "ru/developers/extend/apps/data/objects",
-                      "ru/developers/extend/apps/data/extending-objects",
-                      "ru/developers/extend/apps/data/system-fields",
-                      "ru/developers/extend/apps/data/relations",
-                      "ru/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Логика",
                     "pages": [
                       "ru/developers/extend/apps/logic/overview",
@@ -6177,17 +6056,6 @@
                     ]
                   },
                   {
-                    "group": "Veri",
-                    "pages": [
-                      "tr/developers/extend/apps/data/overview",
-                      "tr/developers/extend/apps/data/objects",
-                      "tr/developers/extend/apps/data/extending-objects",
-                      "tr/developers/extend/apps/data/system-fields",
-                      "tr/developers/extend/apps/data/relations",
-                      "tr/developers/extend/apps/data/timeline-activity-types"
-                    ]
-                  },
-                  {
                     "group": "Mantık",
                     "pages": [
                       "tr/developers/extend/apps/logic/overview",
@@ -6637,17 +6505,6 @@
                       "zh/developers/extend/apps/config/roles",
                       "zh/developers/extend/apps/config/install-hooks",
                       "zh/developers/extend/apps/config/public-assets"
-                    ]
-                  },
-                  {
-                    "group": "数据",
-                    "pages": [
-                      "zh/developers/extend/apps/data/overview",
-                      "zh/developers/extend/apps/data/objects",
-                      "zh/developers/extend/apps/data/extending-objects",
-                      "zh/developers/extend/apps/data/system-fields",
-                      "zh/developers/extend/apps/data/relations",
-                      "zh/developers/extend/apps/data/timeline-activity-types"
                     ]
                   },
                   {

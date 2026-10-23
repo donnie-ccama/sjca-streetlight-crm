@@ -1,6 +1,10 @@
 /.github/              @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /.github/CODEOWNERS    @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /.github/workflows/    @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
+/.github/workflows/deploy-sjca-cloudflare.yaml @donnie-ccama
+/.streetlight/          @donnie-ccama
+/scripts/streetlight/sync-upstream.sh @donnie-ccama
+/docs/streetlight/SJCA_AUTOMATION.md @donnie-ccama
 /.github/actions/      @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /.github/dependabot.yml @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp
 /.yarnrc.yml           @charlesBochet @Weiko @prastoin @bosiraphael @etiennejouan @ijreilly @martmull @thomtrp

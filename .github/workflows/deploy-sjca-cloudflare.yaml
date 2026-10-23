@@ -1,0 +1,102 @@
+name: Deploy SJCA to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type DEPLOY to run a manual production deployment
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sjca-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'push' && vars.SJCA_AUTODEPLOY_ENABLED == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.confirm == 'DEPLOY')
+    environment: sjca-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out the reviewed SJCA source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          corepack yarn install --immutable
+
+      - name: Materialize ignored deployment configuration
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          SJCA_CLOUDFLARE_ZONE_ID: ${{ vars.SJCA_CLOUDFLARE_ZONE_ID }}
+          SJCA_RUNTIME_ENV_JSON: ${{ secrets.SJCA_RUNTIME_ENV_JSON }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+
+          const requireEnvironmentVariable = (name) => {
+            const value = process.env[name];
+
+            if (!value) {
+              throw new Error(`Missing required deployment value: ${name}`);
+            }
+
+            return value;
+          };
+
+          const accountId = requireEnvironmentVariable('CLOUDFLARE_ACCOUNT_ID');
+          const zoneId = requireEnvironmentVariable('SJCA_CLOUDFLARE_ZONE_ID');
+          const runtimeEnvironment = requireEnvironmentVariable(
+            'SJCA_RUNTIME_ENV_JSON',
+          );
+          const sourceUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/commit/${process.env.GITHUB_SHA}`;
+          const tenantDirectory =
+            'packages/streetlight-cloudflare/tenants/sjca';
+
+          JSON.parse(runtimeEnvironment);
+          writeFileSync(
+            `${tenantDirectory}/deployment.json`,
+            `${JSON.stringify(
+              {
+                accountId,
+                hostname: 'sjca.dev',
+                sourceUrl,
+                tenantSlug: 'sjca',
+                zoneId,
+                zoneName: 'sjca.dev',
+              },
+              null,
+              2,
+            )}\n`,
+            { mode: 0o600 },
+          );
+          writeFileSync(
+            `${tenantDirectory}/runtime-env.json`,
+            runtimeEnvironment,
+            { mode: 0o600 },
+          );
+          NODE
+
+      - name: Validate the Cloudflare deployment package
+        run: corepack yarn streetlight:cloudflare:check
+
+      - name: Deploy with Wrangler
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: corepack yarn streetlight:cloudflare:deploy --tenant=sjca

@@ -94,7 +94,8 @@
     "streetlight:ruflo:start": "bash scripts/streetlight/ruflo.sh start",
     "streetlight:ruflo:status": "bash scripts/streetlight/ruflo.sh status",
     "streetlight:ruflo:finish": "bash scripts/streetlight/ruflo.sh finish",
-    "streetlight:smoke": "bash scripts/streetlight/smoke.sh"
+    "streetlight:smoke": "bash scripts/streetlight/smoke.sh",
+    "streetlight:sync:sjca": "bash scripts/streetlight/sync-upstream.sh"
   },
   "workspaces": {
     "packages": [

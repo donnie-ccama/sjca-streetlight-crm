@@ -36,6 +36,11 @@ type WranglerConfiguration = {
 
 const packageDirectory = join(import.meta.dirname, '..');
 const repositoryDirectory = join(packageDirectory, '..', '..');
+const repositoryVersion = (
+  JSON.parse(
+    readFileSync(join(repositoryDirectory, 'package.json'), 'utf8'),
+  ) as { version: string }
+).version;
 const arguments_ = process.argv.slice(2);
 const dryRun = arguments_.includes('--dry-run');
 const tenantArgument = arguments_.find((argument: string) =>
@@ -163,7 +168,7 @@ wranglerConfiguration.routes = [{ custom_domain: true, pattern: hostname }];
 wranglerConfiguration.vars.STREETLIGHT_SOURCE_REVISION = sourceRevision;
 wranglerConfiguration.vars.STREETLIGHT_SOURCE_URL = sourceUrl;
 wranglerConfiguration.vars.STREETLIGHT_TENANT_SLUG = tenantSlug;
-imageBuildVariables.APP_VERSION = `${tenantSlug}-cloudflare`;
+imageBuildVariables.APP_VERSION = repositoryVersion;
 imageBuildVariables.SOURCE_REVISION = sourceRevision;
 imageBuildVariables.SOURCE_URL = sourceUrl;
 

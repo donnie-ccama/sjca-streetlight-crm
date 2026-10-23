@@ -10,8 +10,9 @@ public mirror.
 `.streetlight/upstream.json` records the last private Streetlight revision that
 was accepted as the synchronization baseline. The synchronization script
 applies only the committed patch after that revision. It rejects non-descendant
-history, dirty mirror state, overlapping changes that cannot apply cleanly, and
-common credential-bearing paths.
+history, dirty mirror state, overlapping changes that cannot apply cleanly,
+GitHub automation and SJCA-owned paths, common credential-bearing paths, and
+high-confidence secret patterns in added lines.
 
 Preview an exact committed source revision first:
 
@@ -36,7 +37,8 @@ deploys. Before publication:
 
 1. inspect every staged path and the complete diff;
 2. confirm no private data, credentials, customer data, or internal-only code
-   would enter the public repository;
+   would enter the public repository; the built-in scan is a guardrail, not a
+   substitute for this review;
 3. run the tests appropriate to the changed packages;
 4. commit and push only the reviewed branch; and
 5. merge it through a reviewed pull request.
@@ -63,8 +65,9 @@ Configure the `sjca-production` GitHub environment before activation:
 
 Protect `main`, require review for workflow changes, and decide whether the
 `sjca-production` environment should require a deployment reviewer. The
-workflow materializes ignored mode-0600 configuration files, validates the
-Cloudflare package, and calls the repository's Wrangler deployment wrapper.
+workflow validates the Cloudflare package before secrets are available,
+materializes ignored mode-0600 configuration files, and then calls the
+repository's Wrangler deployment wrapper.
 
 Keep `SJCA_AUTODEPLOY_ENABLED` unset until the initial deployment passes health,
 container, login, email, R2, queue, and recovery acceptance. Enabling the

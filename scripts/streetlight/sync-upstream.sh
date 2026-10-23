@@ -104,9 +104,13 @@ fi
 blocked_path=""
 while IFS= read -r -d '' changed_path; do
   case "$changed_path" in
+    secrets/*|*/secrets/*|.github/*|.claude/*|.agents/*|.claude-flow/*|.swarm/*|.streetlight/*|scripts/streetlight/sync-upstream.sh|docs/streetlight/SJCA_AUTOMATION.md|packages/streetlight-cloudflare/tenants/sjca/*)
+      blocked_path="$changed_path"
+      break
+      ;;
     *.env.example)
       ;;
-    .env|*/.env|*.env|*.env.*|*.pem|*.key|*.p12|*.pfx|*.crt|*.cer|*.der|*.jks|*.keystore|*.mobileprovision|.mcp.json|*/.mcp.json|*/runtime-env.json|*/deployment.json|*/secrets/*|.claude-flow/*|.swarm/*|agentdb.rvf|agentdb.rvf.idmap.json|ruvector.db|.streetlight/upstream.json|scripts/streetlight/sync-upstream.sh|.github/CODEOWNERS|.github/workflows/deploy-sjca-cloudflare.yaml|docs/streetlight/SJCA_AUTOMATION.md|packages/streetlight-cloudflare/tenants/sjca/*)
+    .env|*/.env|*.env|*.env.*|.envrc|*/.envrc|.npmrc|*/.npmrc|.netrc|*/.netrc|.pypirc|*/.pypirc|.git-credentials|*/.git-credentials|.gitmodules|*.pem|*.key|*.p12|*.pfx|*.crt|*.cer|*.der|*.jks|*.keystore|*.mobileprovision|*.tfvars|*.tfvars.json|*.tfstate|*.tfstate.*|*.kubeconfig|*.ovpn|id_rsa|*/id_rsa|id_ed25519|*/id_ed25519|.aws/credentials|*/.aws/credentials|.docker/config.json|*/.docker/config.json|.kube/config|*/.kube/config|.mcp.json|*/.mcp.json|*/runtime-env.json|*/deployment.json|agentdb.rvf|agentdb.rvf.idmap.json|ruvector.db)
       blocked_path="$changed_path"
       break
       ;;
@@ -131,6 +135,49 @@ if [[ ! -s "$temporary_patch" ]]; then
   echo "The selected source range contains no file changes."
   exit 0
 fi
+
+node --input-type=module - "$temporary_patch" <<'NODE'
+import { readFileSync } from 'node:fs';
+
+const patch = readFileSync(process.argv[2], 'utf8');
+const secretPatterns = [
+  /-----BEGIN (?:EC |OPENSSH |PGP |RSA )?PRIVATE KEY-----/,
+  /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/,
+  /\bAIza[0-9A-Za-z_-]{35}\b/,
+  /\bgh[pousr]_[0-9A-Za-z]{30,}\b/,
+  /\bgithub_pat_[0-9A-Za-z_]{40,}\b/,
+  /\b(?:rk|sk)_live_[0-9A-Za-z]{16,}\b/,
+  /\bxox[baprs]-[0-9A-Za-z-]{20,}\b/,
+  /[a-z][a-z0-9+.-]*:\/\/[^\s/:]+:[^\s/@]+@/i,
+  /\b(?:[a-z][a-z0-9]*[_-])*(?:api[_-]?key|client[_-]?secret|password|private[_-]?key|secret(?:[_-]?access[_-]?key)?|token)(?:[_-][a-z0-9]+)*\b\s*[:=]\s*["']?(?!\$\{\{|process\.env|example|placeholder|redacted|replace|<)[0-9A-Za-z_./+=-]{16,}/i,
+];
+const detectedPaths = new Set();
+let changedPath = 'unknown path';
+
+for (const line of patch.split('\n')) {
+  if (line.startsWith('+++ b/')) {
+    changedPath = line.slice('+++ b/'.length);
+    continue;
+  }
+
+  if (!line.startsWith('+') || line.startsWith('+++')) {
+    continue;
+  }
+
+  if (secretPatterns.some((pattern) => pattern.test(line.slice(1)))) {
+    detectedPaths.add(changedPath);
+  }
+}
+
+if (detectedPaths.size > 0) {
+  console.error(
+    `Synchronization rejected potential secret material in: ${[
+      ...detectedPaths,
+    ].join(', ')}`,
+  );
+  process.exit(1);
+}
+NODE
 
 git -C "$mirror_repository_directory" apply --check --binary "$temporary_patch"
 

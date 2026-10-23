@@ -81,22 +81,32 @@ test('rejects an existing DNS record without a matching Worker domain', async ()
 });
 
 test('allows the hostname already assigned to the same Worker', async () => {
+  let requestedDnsRecords = false;
+
   await preflightCloudflareTarget(
     deployment,
     'test-token',
-    createFetcher(
-      validZone,
-      [
-        {
-          hostname: deployment.hostname,
-          service: deployment.workerName,
-          zone_id: deployment.zoneId,
-          zone_name: deployment.zoneName,
-        },
-      ],
-      [{ id: 'record-id', name: deployment.hostname, type: 'CNAME' }],
-    ),
+    async (input) => {
+      if (input.includes('/workers/domains?')) {
+        return response([
+          {
+            hostname: deployment.hostname,
+            service: deployment.workerName,
+            zone_id: deployment.zoneId,
+            zone_name: deployment.zoneName,
+          },
+        ]);
+      }
+
+      if (input.includes('/dns_records?')) {
+        requestedDnsRecords = true;
+      }
+
+      return response(validZone);
+    },
   );
+
+  assert.equal(requestedDnsRecords, false);
 });
 
 test('rejects a hostname assigned to another Worker', async () => {

@@ -95,6 +95,10 @@ export const preflightCloudflareTarget = async (
     throw new Error('Hostname is assigned to a different Worker or zone');
   }
 
+  if (workerDomains.length > 0) {
+    return;
+  }
+
   const dnsQuery = new URLSearchParams({
     'name.exact': deployment.hostname,
     per_page: '100',
@@ -105,7 +109,7 @@ export const preflightCloudflareTarget = async (
     fetcher,
   );
 
-  if (dnsRecords.length > 0 && workerDomains.length === 0) {
+  if (dnsRecords.length > 0) {
     throw new Error('Hostname has a conflicting DNS record');
   }
 };

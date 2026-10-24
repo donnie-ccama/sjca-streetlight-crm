@@ -136,7 +136,8 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
         if (
           !isInviteMode &&
           signInUpMode === SignInUpMode.SignIn &&
-          isOnAWorkspace
+          isOnAWorkspace &&
+          isDefined(workspacePublicData)
         ) {
           return await signInWithCredentialsInWorkspace(
             data.email.toLowerCase().trim(),
@@ -148,7 +149,7 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
         if (
           !isInviteMode &&
           signInUpMode === SignInUpMode.SignIn &&
-          !isOnAWorkspace
+          (!isOnAWorkspace || !isDefined(workspacePublicData))
         ) {
           return await signInWithCredentials(
             data.email.toLowerCase().trim(),

@@ -70,10 +70,12 @@ COPY ./packages/twenty-sdk /app/packages/twenty-sdk
 COPY ./packages/twenty-client-sdk /app/packages/twenty-client-sdk
 RUN npx nx run twenty-front:lingui:extract && \
     npx nx run twenty-front:lingui:compile
-# To skip the memory-intensive frontend build, pre-build on the host:
-#   npx nx build twenty-front
-# The check below will use packages/twenty-front/build/ if it already exists.
-RUN if [ -d /app/packages/twenty-front/build ]; then \
+ARG SOURCE_REVISION
+# Ignored host output must belong to the exact source being deployed.
+RUN if [ -d /app/packages/twenty-front/build ] && [ -n "$SOURCE_REVISION" ]; then \
+      test -f /app/packages/twenty-front/build/.source-revision && \
+      test "$(cat /app/packages/twenty-front/build/.source-revision)" = "$SOURCE_REVISION" || \
+        { echo "Rebuild the host frontend from this source revision before deploying" >&2; exit 1; }; \
       echo "Using pre-built frontend from host"; \
     else \
       NODE_OPTIONS="--max-old-space-size=8192" npx nx build twenty-front; \

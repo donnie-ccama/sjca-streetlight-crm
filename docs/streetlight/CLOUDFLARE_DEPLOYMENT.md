@@ -135,6 +135,20 @@ corepack yarn streetlight:cloudflare:check
 
 ## Deploy
 
+If `packages/twenty-front/build` exists locally, Docker requires a matching
+`.source-revision` receipt instead of silently reusing potentially stale output.
+After committing the reviewed source, build and stamp it from a clean checkout:
+
+```bash
+test -z "$(git status --porcelain --untracked-files=all)" &&
+npx nx build twenty-front --skip-nx-cache &&
+test -z "$(git status --porcelain --untracked-files=all)" &&
+git rev-parse HEAD > packages/twenty-front/build/.source-revision
+```
+
+Without host output, Docker builds the frontend itself. Never copy a receipt
+onto an old build or reuse it after changing source or dependencies.
+
 Deployment builds the production `streetlight-cloudflare` target for
 `linux/amd64`, publishes the Worker, pushes the image to Cloudflare's managed
 registry, and creates the two Container instances on first traffic or the next

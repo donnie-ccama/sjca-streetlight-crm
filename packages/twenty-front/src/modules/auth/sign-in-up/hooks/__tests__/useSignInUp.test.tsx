@@ -50,10 +50,14 @@ jest.mock(
 
 const signUpWithCredentialsMock = jest.fn();
 const signUpWithCredentialsInWorkspaceMock = jest.fn();
+const signInWithCredentialsMock = jest.fn();
+const signInWithCredentialsInWorkspaceMock = jest.fn();
 
 (useAuth as jest.Mock).mockReturnValue({
   signUpWithCredentialsInWorkspace: signUpWithCredentialsInWorkspaceMock,
   signUpWithCredentials: signUpWithCredentialsMock,
+  signInWithCredentials: signInWithCredentialsMock,
+  signInWithCredentialsInWorkspace: signInWithCredentialsInWorkspaceMock,
   checkUserExists: { checkUserExistsQuery: jest.fn() },
 });
 
@@ -64,9 +68,12 @@ const credentials: Form = {
   captchaToken: '',
 };
 
-const renderUseSignInUp = (workspacePublicData: PublicWorkspaceData | null) => {
+const renderUseSignInUp = (
+  workspacePublicData: PublicWorkspaceData | null,
+  mode = SignInUpMode.SignUp,
+) => {
   jotaiStore.set(workspacePublicDataState.atom, workspacePublicData);
-  jotaiStore.set(signInUpModeState.atom, SignInUpMode.SignUp);
+  jotaiStore.set(signInUpModeState.atom, mode);
 
   return renderHook(() => useSignInUp({} as UseFormReturn<Form>), {
     wrapper: ({ children }) => (
@@ -79,10 +86,45 @@ const renderUseSignInUp = (workspacePublicData: PublicWorkspaceData | null) => {
   });
 };
 
-describe('useSignInUp > submitCredentials > sign-up routing', () => {
+describe('useSignInUp > submitCredentials > workspace routing', () => {
   beforeEach(() => {
     resetJotaiStore();
     jest.clearAllMocks();
+  });
+
+  it('signs in to the workspace when the location resolves one', async () => {
+    const { result } = renderUseSignInUp(
+      { id: 'workspace-id' } as PublicWorkspaceData,
+      SignInUpMode.SignIn,
+    );
+
+    await act(() => result.current.submitCredentials(credentials));
+
+    expect(signInWithCredentialsInWorkspaceMock).toHaveBeenCalledWith(
+      'someone@example.com',
+      'Passw0rd!',
+      'captcha-token',
+    );
+    expect(signInWithCredentialsInWorkspaceMock).toHaveBeenCalledTimes(1);
+    expect(signInWithCredentialsMock).not.toHaveBeenCalled();
+    expect(signUpWithCredentialsMock).not.toHaveBeenCalled();
+    expect(signUpWithCredentialsInWorkspaceMock).not.toHaveBeenCalled();
+  });
+
+  it('signs in without a workspace so the first user can resume setup', async () => {
+    const { result } = renderUseSignInUp(null, SignInUpMode.SignIn);
+
+    await act(() => result.current.submitCredentials(credentials));
+
+    expect(signInWithCredentialsMock).toHaveBeenCalledWith(
+      'someone@example.com',
+      'Passw0rd!',
+      'captcha-token',
+    );
+    expect(signInWithCredentialsMock).toHaveBeenCalledTimes(1);
+    expect(signInWithCredentialsInWorkspaceMock).not.toHaveBeenCalled();
+    expect(signUpWithCredentialsMock).not.toHaveBeenCalled();
+    expect(signUpWithCredentialsInWorkspaceMock).not.toHaveBeenCalled();
   });
 
   it('signs up in the workspace when the location resolves one, so its approved access domains are checked', async () => {

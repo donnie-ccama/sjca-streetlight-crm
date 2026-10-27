@@ -1,8 +1,8 @@
 // Shared donor-rollup primitives used by both the nightly sweep
 // (recompute-donor-rollups.logic-function.ts) and the real-time per-credit
 // updater (update-donor-rollup-on-credit.logic-function.ts). Keeping the
-// math here ensures both functions agree on how Person.lifetimeHardGiving,
-// firstGiftDate, and lastGiftDate are derived from hard-credit DonationCredits.
+// math here ensures both functions agree on how Person giving totals,
+// gift dates, and gift count are derived from hard-credit DonationCredits.
 //
 // Data access goes through workspace-gql raw requests: the generated
 // twenty-client-sdk validates queries against an app-scoped schema at
@@ -15,6 +15,7 @@ export type CreditRow = {
   amountMicros: string;
   currencyCode?: string;
   giftDate?: string;
+  giftStatus?: string;
 };
 
 export type Rollup = {
@@ -22,8 +23,15 @@ export type Rollup = {
   currencyCode?: string;
   firstGiftDate?: string;
   lastGiftDate?: string;
+  lastGiftAmountMicros: bigint;
+  largestGiftMicros: bigint;
+  givingThisYearMicros: bigint;
+  givingLastYearMicros: bigint;
   creditCount: number;
 };
+
+// Gifts imported before giftStatus existed have no status and count as paid.
+const COUNTED_GIFT_STATUSES = new Set([undefined, null, 'PAID']);
 
 export const minDate = (a?: string, b?: string): string | undefined => {
   if (!a) return b;
@@ -37,21 +45,44 @@ export const maxDate = (a?: string, b?: string): string | undefined => {
   return a >= b ? a : b;
 };
 
-export const computeRollup = (rows: CreditRow[]): Rollup => {
+const giftYear = (giftDate?: string): number | undefined =>
+  giftDate ? Number(giftDate.slice(0, 4)) : undefined;
+
+export const computeRollup = (
+  rows: CreditRow[],
+  currentYear: number = new Date().getUTCFullYear(),
+): Rollup => {
   const rollup: Rollup = {
     lifetimeHardGivingMicros: 0n,
     currencyCode: undefined,
     firstGiftDate: undefined,
     lastGiftDate: undefined,
+    lastGiftAmountMicros: 0n,
+    largestGiftMicros: 0n,
+    givingThisYearMicros: 0n,
+    givingLastYearMicros: 0n,
     creditCount: 0,
   };
   for (const row of rows) {
-    rollup.lifetimeHardGivingMicros += BigInt(row.amountMicros || '0');
+    if (!COUNTED_GIFT_STATUSES.has(row.giftStatus)) continue;
+    const amountMicros = BigInt(row.amountMicros || '0');
+    rollup.lifetimeHardGivingMicros += amountMicros;
     if (row.currencyCode && !rollup.currencyCode) {
       rollup.currencyCode = row.currencyCode;
     }
     rollup.firstGiftDate = minDate(rollup.firstGiftDate, row.giftDate);
-    rollup.lastGiftDate = maxDate(rollup.lastGiftDate, row.giftDate);
+    if (row.giftDate && row.giftDate === rollup.lastGiftDate) {
+      rollup.lastGiftAmountMicros += amountMicros;
+    } else if (maxDate(rollup.lastGiftDate, row.giftDate) !== rollup.lastGiftDate) {
+      rollup.lastGiftDate = row.giftDate;
+      rollup.lastGiftAmountMicros = amountMicros;
+    }
+    if (amountMicros > rollup.largestGiftMicros) {
+      rollup.largestGiftMicros = amountMicros;
+    }
+    const year = giftYear(row.giftDate);
+    if (year === currentYear) rollup.givingThisYearMicros += amountMicros;
+    if (year === currentYear - 1) rollup.givingLastYearMicros += amountMicros;
     rollup.creditCount += 1;
   }
   return rollup;
@@ -60,7 +91,7 @@ export const computeRollup = (rows: CreditRow[]): Rollup => {
 const PAGE_SIZE = 500;
 
 const CREDIT_PAGE_SELECTION = `
-  edges { node { id creditAmount { amountMicros currencyCode } donation { giftDate } } }
+  edges { node { id creditAmount { amountMicros currencyCode } donation { giftDate giftStatus } } }
   pageInfo { hasNextPage endCursor }
 `;
 
@@ -91,6 +122,7 @@ export const fetchHardCreditsForPerson = async (
         amountMicros: node.creditAmount?.amountMicros ?? '0',
         currencyCode: node.creditAmount?.currencyCode,
         giftDate: node.donation?.giftDate,
+        giftStatus: node.donation?.giftStatus,
       });
     }
 
@@ -112,7 +144,7 @@ export const fetchAllHardCredits = async (): Promise<CreditRow[]> => {
     const data = await gql(
       `query {
         donationCredits(first: ${PAGE_SIZE}${afterClause}, filter: {creditType: {eq: HARD}}) {
-          edges { node { id creditAmount { amountMicros currencyCode } person { id } donation { giftDate } } }
+          edges { node { id creditAmount { amountMicros currencyCode } person { id } donation { giftDate giftStatus } } }
           pageInfo { hasNextPage endCursor }
         }
       }`,
@@ -127,6 +159,7 @@ export const fetchAllHardCredits = async (): Promise<CreditRow[]> => {
         amountMicros: node.creditAmount?.amountMicros ?? '0',
         currencyCode: node.creditAmount?.currencyCode,
         giftDate: node.donation?.giftDate,
+        giftStatus: node.donation?.giftStatus,
       });
     }
 
@@ -141,31 +174,24 @@ export const fetchAllHardCredits = async (): Promise<CreditRow[]> => {
 /** Groups flat credit rows into per-Person rollups. Used by the sweep. */
 export const groupRollupsByPerson = (
   rows: CreditRow[],
+  currentYear: number = new Date().getUTCFullYear(),
 ): Map<string, Rollup> => {
-  const byPerson = new Map<string, Rollup>();
+  const rowsByPerson = new Map<string, CreditRow[]>();
   for (const row of rows) {
-    const existing = byPerson.get(row.personId);
-    const rollup = existing
-      ? {
-          ...existing,
-          lifetimeHardGivingMicros:
-            existing.lifetimeHardGivingMicros + BigInt(row.amountMicros || '0'),
-          currencyCode: existing.currencyCode ?? row.currencyCode,
-          firstGiftDate: minDate(existing.firstGiftDate, row.giftDate),
-          lastGiftDate: maxDate(existing.lastGiftDate, row.giftDate),
-          creditCount: existing.creditCount + 1,
-        }
-      : {
-          lifetimeHardGivingMicros: BigInt(row.amountMicros || '0'),
-          currencyCode: row.currencyCode,
-          firstGiftDate: row.giftDate,
-          lastGiftDate: row.giftDate,
-          creditCount: 1,
-        };
-    byPerson.set(row.personId, rollup);
+    rowsByPerson.set(row.personId, [
+      ...(rowsByPerson.get(row.personId) ?? []),
+      row,
+    ]);
+  }
+  const byPerson = new Map<string, Rollup>();
+  for (const [personId, personRows] of rowsByPerson) {
+    byPerson.set(personId, computeRollup(personRows, currentYear));
   }
   return byPerson;
 };
+
+const currencyInput = (amountMicros: bigint, currencyCode: string) =>
+  `{ amountMicros: "${amountMicros.toString()}", currencyCode: "${currencyCode}" }`;
 
 /**
  * Writes one Person's rollup fields. Raw mutation because lifetimeHardGiving
@@ -175,12 +201,18 @@ export const writePersonRollup = async (
   personId: string,
   rollup: Rollup,
 ): Promise<void> => {
+  const currencyCode = rollup.currencyCode ?? 'USD';
   const data = await gql(
     `mutation {
       updatePerson(
         id: "${personId}",
         data: {
-          lifetimeHardGiving: { amountMicros: "${rollup.lifetimeHardGivingMicros.toString()}", currencyCode: "${rollup.currencyCode ?? 'USD'}" },
+          lifetimeHardGiving: ${currencyInput(rollup.lifetimeHardGivingMicros, currencyCode)},
+          lastGiftAmount: ${currencyInput(rollup.lastGiftAmountMicros, currencyCode)},
+          largestGift: ${currencyInput(rollup.largestGiftMicros, currencyCode)},
+          givingThisYear: ${currencyInput(rollup.givingThisYearMicros, currencyCode)},
+          givingLastYear: ${currencyInput(rollup.givingLastYearMicros, currencyCode)},
+          giftCount: ${rollup.creditCount},
           firstGiftDate: ${rollup.firstGiftDate ? `"${rollup.firstGiftDate}"` : 'null'},
           lastGiftDate: ${rollup.lastGiftDate ? `"${rollup.lastGiftDate}"` : 'null'}
         }

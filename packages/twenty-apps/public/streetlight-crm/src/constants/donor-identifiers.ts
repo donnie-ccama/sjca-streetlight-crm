@@ -106,6 +106,40 @@ export const PERSON_PREFERRED_ACKNOWLEDGMENT_FIELD_ID =
   '67a74c51-6117-4aad-9ab9-5e811c0bb714';
 export const PERSON_DO_NOT_SOLICIT_FIELD_ID = '6bb727d0-f7b7-488e-a5ac-10443b0d882d';
 export const PERSON_EXTERNAL_DONOR_ID_FIELD_ID = 'c90327cf-a6ba-4c34-9fd9-bcf2d01f56a9';
+export const PERSON_IS_DECEASED_FIELD_ID = 'b0fcc524-5bc7-405c-82ce-2645edd1a127';
+export const PERSON_IS_ANONYMOUS_FIELD_ID = '74c8fe86-69b6-4e2d-9fa2-b5164ccaa729';
+export const PERSON_SMS_CONSENT_FIELD_ID = '359b54b6-53bf-4050-af0b-14ae68fc4379';
+export const PERSON_DO_NOT_EMAIL_FIELD_ID = 'fc093b6c-4cc1-4a97-979c-ed4442b2d994';
+export const PERSON_DO_NOT_MAIL_FIELD_ID = 'd8f9eadb-fc0f-432e-8c29-55440f778ac9';
+export const PERSON_DO_NOT_CALL_FIELD_ID = 'b716fc3c-a573-4c4d-92cf-399000ae070c';
+export const PERSON_CONSTITUENT_TYPES_FIELD_ID = 'da6819e8-92ae-4988-83c1-56946cd49564';
+export const PERSON_GIFT_COUNT_FIELD_ID = '919c667e-4883-4491-8782-4e90807d0a25';
+export const PERSON_LARGEST_GIFT_FIELD_ID = 'e3664490-e19d-4fd3-84d6-21803dc70c37';
+export const PERSON_LAST_GIFT_AMOUNT_FIELD_ID = '6e8817a4-e625-41dd-baa8-5f64295caca6';
+export const PERSON_GIVING_THIS_YEAR_FIELD_ID = 'cf6b2979-af8d-4dcf-8445-9e02e835cec9';
+export const PERSON_GIVING_LAST_YEAR_FIELD_ID = '35f97bea-b3fb-4c55-bb88-bd5dabe614c9';
+
+// ─────────────────── Donation gift-processing fields ───────────────
+export const DONATION_GIFT_STATUS_FIELD_ID = '29387385-3e35-4689-bea8-655a154090db';
+export const DONATION_ACKNOWLEDGMENT_DATE_FIELD_ID =
+  'c2273aef-4197-4417-9a59-c532c4cd9394';
+export const DONATION_TAX_RECEIPT_STATUS_FIELD_ID =
+  'e317ed15-d855-4b31-971f-c37fc6f879e4';
+export const DONATION_IN_KIND_TYPE_FIELD_ID = '9e30ea08-e72a-4d43-b1dc-c4e4b5c8ee82';
+export const DONATION_IN_KIND_FAIR_MARKET_VALUE_FIELD_ID =
+  '797e49e5-7688-40d7-8966-24ab510f801a';
+export const DONATION_MATCHING_GIFT_STATUS_FIELD_ID =
+  '44d681ed-54bf-482f-93e0-5b0961e8a2f6';
+export const DONATION_TRIBUTE_NOTIFICATION_RECIPIENT_FIELD_ID =
+  'a2285924-96d0-4f8c-ba18-761c626fc13a';
+export const DONATION_TRIBUTE_NOTIFICATION_STATUS_FIELD_ID =
+  '441886aa-f39d-4466-90e9-fd076c454ca7';
+
+// ─────────────────── Pledge commitment fields ──────────────────────
+export const PLEDGE_COMMITMENT_TYPE_FIELD_ID = '67989306-daf7-4478-a933-4d78b469e0e2';
+export const PLEDGE_INSTALLMENT_AMOUNT_FIELD_ID = 'd8ba93bf-67ef-4564-85a2-8f49c515369d';
+export const PLEDGE_NEXT_PAYMENT_DATE_FIELD_ID = 'ad04a5d4-c793-4241-aea8-cd03b6242c2e';
+export const PLEDGE_CLOSED_REASON_FIELD_ID = '2b09aade-6cf9-47ea-a749-6759cd15998d';
 
 // ───────────────────── Stage 2: relation reverse-side IDs ─────────────────────
 // (Reserved now, wired in Stage 2. See docs/schema-spec.md for relation map.)

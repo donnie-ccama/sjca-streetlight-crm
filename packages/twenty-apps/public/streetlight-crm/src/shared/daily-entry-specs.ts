@@ -29,6 +29,10 @@ export type PaymentMethodValue =
   | 'STOCK'
   | 'CASH'
   | 'IN_KIND'
+  | 'PAYPAL'
+  | 'VENMO'
+  | 'CRYPTOCURRENCY'
+  | 'UNKNOWN'
   | 'OTHER';
 
 export type GiftEntryMode = 'DAILY_GIVING' | 'CASH_DEPOSIT' | 'ONLINE_GIFT';
@@ -46,6 +50,10 @@ export const PAYMENT_METHODS: ReadonlyArray<{
   { value: 'STOCK', label: 'Stock / Securities', isInKind: false },
   { value: 'CASH', label: 'Cash', isInKind: false },
   { value: 'IN_KIND', label: 'In-Kind (goods & services)', isInKind: true },
+  { value: 'PAYPAL', label: 'PayPal', isInKind: false },
+  { value: 'VENMO', label: 'Venmo', isInKind: false },
+  { value: 'CRYPTOCURRENCY', label: 'Cryptocurrency', isInKind: false },
+  { value: 'UNKNOWN', label: 'Unknown', isInKind: false },
   { value: 'OTHER', label: 'Other', isInKind: false },
 ];
 

@@ -78,6 +78,8 @@ export default defineObject({
           position: 4,
           color: 'turquoise',
         },
+        { value: 'SOLICITOR', label: 'Solicitor', position: 5, color: 'orange' },
+        { value: 'INFLUENCER', label: 'Influencer', position: 6, color: 'amber' },
       ],
     },
     {

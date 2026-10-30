@@ -1,0 +1,6 @@
+[Unit]
+Description=Streetlight CRM database and file-storage backup
+
+[Service]
+Type=oneshot
+ExecStart=/srv/streetlight/app/scripts/streetlight/selfhosted-backup.sh /srv/streetlight/backups 14

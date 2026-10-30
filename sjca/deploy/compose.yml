@@ -1,0 +1,68 @@
+# Run with: docker compose --env-file sjca.env up -d
+# The --env-file flag fills the ${...} values below. Services read sjca.env directly.
+name: sjca-crm
+
+x-streetlight-app: &streetlight-app
+  image: ${STREETLIGHT_IMAGE:?Set STREETLIGHT_IMAGE to an immutable image tag or digest}
+  env_file:
+    - sjca.env
+  volumes:
+    - streetlight-local-storage:/app/packages/twenty-server/.local-storage
+  restart: unless-stopped
+
+services:
+  server:
+    <<: *streetlight-app
+    environment:
+      NODE_PORT: 3000
+      DISABLE_DB_MIGRATIONS: "false"
+      DISABLE_CRON_JOBS_REGISTRATION: "false"
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    <<: *streetlight-app
+    command: ["yarn", "worker:prod"]
+    environment:
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+    depends_on:
+      server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.4.12-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Only TUNNEL_TOKEN reaches this service. It does not get the other secrets.
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.4
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in sjca.env}
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  streetlight-local-storage:
+  redis-data:

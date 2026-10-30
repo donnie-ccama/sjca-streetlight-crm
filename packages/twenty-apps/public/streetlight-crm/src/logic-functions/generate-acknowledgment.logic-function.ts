@@ -20,6 +20,7 @@ type Donation = {
   paymentMethod?: string;
   tributeType?: string;
   tributeName?: string;
+  acknowledgmentStatus?: string | null;
 };
 
 type DonationCreatedEvent = DatabaseEventPayload<ObjectRecordCreateEvent<Donation>>;
@@ -68,8 +69,22 @@ const composeTaskBody = (donation: Donation, donorName: string): string => {
   return lines.join('\n');
 };
 
+// Only PENDING gifts need a task. Imported historical gifts arrive as SENT or
+// DO_NOT_ACKNOWLEDGE. A missing status counts as PENDING.
+export const shouldCreateAcknowledgmentTask = (
+  donation: Pick<Donation, 'acknowledgmentStatus'>,
+): boolean =>
+  donation.acknowledgmentStatus === undefined ||
+  donation.acknowledgmentStatus === null ||
+  donation.acknowledgmentStatus === 'PENDING';
+
 const handler = async (event: DonationCreatedEvent) => {
   const donation = event.properties.after;
+
+  if (!shouldCreateAcknowledgmentTask(donation)) {
+    return { skipped: true, donationId: donation.id };
+  }
+
   const client = new CoreApiClient();
 
   // Resolve the hard-credit donor (the Donation Credit with creditType = HARD

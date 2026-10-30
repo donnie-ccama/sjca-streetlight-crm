@@ -25,7 +25,7 @@ hosted tenant.
 1. Read [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md).
 2. Read [DATA_SAFETY.md](./DATA_SAFETY.md) before importing any customer data.
 3. Use [DEPLOYMENT.md](./DEPLOYMENT.md) to prepare a hosted environment,
-   [SJCA_SELF_HOSTED.md](./SJCA_SELF_HOSTED.md) for SJCA's self-hosted server,
+   [sjca/README.md](../../sjca/README.md) for SJCA's self-hosted server,
    [SELF_HOSTED.md](./SELF_HOSTED.md) for a single tailnet-only host, or
    [CLOUDFLARE_DEPLOYMENT.md](./CLOUDFLARE_DEPLOYMENT.md) for Cloudflare Containers.
 4. Use [APP_INSTALLATION.md](./APP_INSTALLATION.md) to plan and install the

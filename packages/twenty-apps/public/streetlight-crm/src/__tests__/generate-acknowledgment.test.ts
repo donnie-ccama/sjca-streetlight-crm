@@ -11,6 +11,10 @@ describe('shouldCreateAcknowledgmentTask', () => {
     expect(shouldCreateAcknowledgmentTask({})).toBe(true);
   });
 
+  it.each(['', '  '])('returns true for a blank status %o', (status) => {
+    expect(shouldCreateAcknowledgmentTask({ acknowledgmentStatus: status })).toBe(true);
+  });
+
   it.each(['SENT', 'DO_NOT_ACKNOWLEDGE'])('returns false for %s', (status) => {
     expect(shouldCreateAcknowledgmentTask({ acknowledgmentStatus: status })).toBe(false);
   });

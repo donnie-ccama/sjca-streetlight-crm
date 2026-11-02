@@ -70,13 +70,14 @@ const composeTaskBody = (donation: Donation, donorName: string): string => {
 };
 
 // Only PENDING gifts need a task. Imported historical gifts arrive as SENT or
-// DO_NOT_ACKNOWLEDGE. A missing status counts as PENDING.
+// DO_NOT_ACKNOWLEDGE. A missing, null, or blank status counts as PENDING,
+// because blank imports leave the column empty.
 export const shouldCreateAcknowledgmentTask = (
   donation: Pick<Donation, 'acknowledgmentStatus'>,
-): boolean =>
-  donation.acknowledgmentStatus === undefined ||
-  donation.acknowledgmentStatus === null ||
-  donation.acknowledgmentStatus === 'PENDING';
+): boolean => {
+  const status = donation.acknowledgmentStatus?.trim();
+  return !status || status === 'PENDING';
+};
 
 const handler = async (event: DonationCreatedEvent) => {
   const donation = event.properties.after;

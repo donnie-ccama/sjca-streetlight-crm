@@ -25,6 +25,10 @@ export const HOUSEHOLD_PRIMARY_CONTACT_FIELD_ID = '66d8295c-204a-440a-ba96-f6b15
 export const HOUSEHOLD_FORMAL_SALUTATION_FIELD_ID = '08a2ccb7-b270-45cd-b595-515af1d6545f';
 export const HOUSEHOLD_MAILING_ADDRESS_FIELD_ID = 'f6bc7563-a2b4-4293-966f-aaec7fcbb48d';
 export const HOUSEHOLD_LIFETIME_HARD_GIVING_FIELD_ID = '6b6c7990-fc68-4c4d-9d21-5077f05309e4';
+export const HOUSEHOLD_EXTERNAL_DONOR_ID_FIELD_ID = '032949a4-8928-41b1-9a4f-a66b96e2ab74';
+export const HOUSEHOLD_PRIMARY_EMAIL_FIELD_ID = 'ef4ba8d7-41b9-4e64-a4e4-10989768e69d';
+export const HOUSEHOLD_PRIMARY_PHONE_FIELD_ID = 'e3b9aaed-2b55-43a6-8ca7-91f3ff3cecb9';
+export const HOUSEHOLD_SOURCE_DETAILS_FIELD_ID = '0d741faf-002f-4381-b5ff-e26e38a32578';
 
 // ──────────────────── Household Member scalar fields ────────────────
 export const HOUSEHOLD_MEMBER_HOUSEHOLD_FIELD_ID = '8625f637-d26d-40e7-ac3e-a4d5dd5c91e5';
@@ -54,6 +58,8 @@ export const DONATION_STATEMENT_INCLUDED_FIELD_ID = 'e1e58bd3-a16c-4730-8db5-684
 export const DONATION_PROCESSING_FEE_FIELD_ID =
   '57248050-e480-4b04-8c48-e661f68e991b';
 export const DONATION_COMPANY_FIELD_ID = 'e4712484-9965-42cf-b292-3d505d4cb367';
+export const DONATION_HOUSEHOLD_FIELD_ID = 'a014e47f-62c8-4b0a-bbcf-3a9520074121';
+export const DONATION_SOURCE_DETAILS_FIELD_ID = '39ef6ef9-ce85-4e24-aba4-1efe75fb136a';
 export const DONATION_FUNDRAISING_CAMPAIGN_FIELD_ID = 'af62fc0d-8a3b-4111-87c3-3c7e0a171744';
 export const DONATION_FUND_FIELD_ID = '6f998763-85cc-4345-a2cf-da5b48e8e12a';
 export const DONATION_PLEDGE_FIELD_ID = '5aff888b-5155-40ef-a9b8-ad6a4d62b82c';
@@ -67,6 +73,8 @@ export const DONATION_CREDIT_CREDIT_AMOUNT_FIELD_ID = '188f7a48-c504-4e23-9624-7
 export const DONATION_CREDIT_INCLUDE_IN_STATEMENT_FIELD_ID =
   'cd25d430-45e9-4b49-91cd-2cef146fbd65';
 export const DONATION_CREDIT_THANKED_FIELD_ID = 'f5dde4b7-422b-480d-ab44-492bfd949d1c';
+export const DONATION_CREDIT_EXTERNAL_CREDIT_ID_FIELD_ID =
+  '1fcf75bb-6149-4353-944a-e9a6a4a67cd2';
 
 // ─────────────────────── Fund scalar fields ────────────────────────
 export const FUND_CODE_FIELD_ID = '56f70de9-5ffa-4232-be01-0b8dcaa38874';
@@ -141,6 +149,15 @@ export const PLEDGE_INSTALLMENT_AMOUNT_FIELD_ID = 'd8ba93bf-67ef-4564-85a2-8f49c
 export const PLEDGE_NEXT_PAYMENT_DATE_FIELD_ID = 'ad04a5d4-c793-4241-aea8-cd03b6242c2e';
 export const PLEDGE_CLOSED_REASON_FIELD_ID = '2b09aade-6cf9-47ea-a749-6759cd15998d';
 
+export const PERSON_MAILING_ADDRESS_FIELD_ID = 'd9d4db5d-b3e1-4e68-8025-d049d4f727e0';
+export const PERSON_SOURCE_DETAILS_FIELD_ID = 'f93770a4-0563-4d5d-97e7-7455692c234c';
+
+// ───────────────────── Company extension field IDs ─────────────────────
+export const COMPANY_EXTERNAL_ORG_ID_FIELD_ID = 'a06c5995-5a2b-4c52-943f-90fd989b0a3e';
+export const COMPANY_PRIMARY_EMAIL_FIELD_ID = '4c16737d-cbc6-4033-ba9f-417c310e9b5b';
+export const COMPANY_PRIMARY_PHONE_FIELD_ID = 'd4827af6-1000-4522-bb2e-7e385cc5a4cc';
+export const COMPANY_SOURCE_DETAILS_FIELD_ID = 'a4aa9c63-0099-40ff-8701-fc8186f6fb22';
+
 // ───────────────────── Stage 2: relation reverse-side IDs ─────────────────────
 // (Reserved now, wired in Stage 2. See docs/schema-spec.md for relation map.)
 
@@ -155,6 +172,9 @@ export const PERSON_HOUSEHOLD_MEMBERSHIPS_FIELD_ID = 'be608953-f0be-4e9f-a2f1-db
 
 // Donation.company (M2O → Company) reverse: Company.donations (O2M)
 export const COMPANY_DONATIONS_FIELD_ID = '4c9e0fc8-03bf-4cc8-a9ee-148b22ab7b3a';
+
+// Donation.household (M2O → Household) reverse: Household.donations (O2M)
+export const HOUSEHOLD_DONATIONS_FIELD_ID = '51770df2-1265-45c8-8544-91cf19ecf67f';
 
 // Donation.fundraisingCampaign (M2O → FundraisingCampaign) reverse: FundraisingCampaign.donations (O2M)
 export const FUNDRAISING_CAMPAIGN_DONATIONS_FIELD_ID = 'b602e819-7e17-4d6e-9208-d47e43269370';

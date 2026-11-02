@@ -8,6 +8,8 @@ import {
 
 import {
   HOUSEHOLD_FORMAL_SALUTATION_FIELD_ID,
+  HOUSEHOLD_DONATIONS_FIELD_ID,
+  HOUSEHOLD_EXTERNAL_DONOR_ID_FIELD_ID,
   HOUSEHOLD_LIFETIME_HARD_GIVING_FIELD_ID,
   HOUSEHOLD_MAILING_ADDRESS_FIELD_ID,
   HOUSEHOLD_MEMBER_HOUSEHOLD_FIELD_ID,
@@ -15,9 +17,14 @@ import {
   HOUSEHOLD_MEMBERS_FIELD_ID,
   HOUSEHOLD_NAME_FIELD_ID,
   HOUSEHOLD_OBJECT_ID,
+  HOUSEHOLD_PRIMARY_EMAIL_FIELD_ID,
+  HOUSEHOLD_PRIMARY_PHONE_FIELD_ID,
   HOUSEHOLD_PRIMARY_CONTACT_FIELD_ID,
+  HOUSEHOLD_SOURCE_DETAILS_FIELD_ID,
+  DONATION_HOUSEHOLD_FIELD_ID,
   PERSON_HOUSEHOLDS_FIELD_ID,
 } from 'src/constants/donor-identifiers';
+import { DONATION_OBJECT_UID } from 'src/constants/dashboard-identifiers';
 
 export default defineObject({
   universalIdentifier: HOUSEHOLD_OBJECT_ID,
@@ -45,6 +52,31 @@ export default defineObject({
       isNullable: true,
     },
     {
+      universalIdentifier: HOUSEHOLD_EXTERNAL_DONOR_ID_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'externalDonorId',
+      label: 'External Donor ID',
+      icon: 'IconFingerprint',
+      isNullable: true,
+      isUnique: true,
+    },
+    {
+      universalIdentifier: HOUSEHOLD_PRIMARY_EMAIL_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'primaryEmail',
+      label: 'Primary Email',
+      icon: 'IconMail',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: HOUSEHOLD_PRIMARY_PHONE_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'primaryPhone',
+      label: 'Primary Phone',
+      icon: 'IconPhone',
+      isNullable: true,
+    },
+    {
       universalIdentifier: HOUSEHOLD_MAILING_ADDRESS_FIELD_ID,
       type: FieldType.ADDRESS,
       name: 'mailingAddress',
@@ -59,6 +91,16 @@ export default defineObject({
       label: 'Lifetime Hard Giving',
       icon: 'IconCurrencyDollar',
       isNullable: true,
+    },
+    {
+      universalIdentifier: HOUSEHOLD_SOURCE_DETAILS_FIELD_ID,
+      type: FieldType.RAW_JSON,
+      name: 'sourceDetails',
+      label: 'Source Details',
+      description: 'Source-sheet fields and evidence retained for audit.',
+      icon: 'IconBraces',
+      isNullable: true,
+      isUIEditable: false,
     },
     {
       universalIdentifier: HOUSEHOLD_PRIMARY_CONTACT_FIELD_ID,
@@ -84,6 +126,16 @@ export default defineObject({
       relationTargetObjectMetadataUniversalIdentifier: HOUSEHOLD_MEMBER_OBJECT_ID,
       relationTargetFieldMetadataUniversalIdentifier:
         HOUSEHOLD_MEMBER_HOUSEHOLD_FIELD_ID,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
+    {
+      universalIdentifier: HOUSEHOLD_DONATIONS_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'donations',
+      label: 'Donations',
+      icon: 'IconHeartHandshake',
+      relationTargetObjectMetadataUniversalIdentifier: DONATION_OBJECT_UID,
+      relationTargetFieldMetadataUniversalIdentifier: DONATION_HOUSEHOLD_FIELD_ID,
       universalSettings: { relationType: RelationType.ONE_TO_MANY },
     },
   ],

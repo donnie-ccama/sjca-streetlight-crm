@@ -12,6 +12,7 @@ import {
   DONATION_CREDIT_CREDIT_ROLE_FIELD_ID,
   DONATION_CREDIT_CREDIT_TYPE_FIELD_ID,
   DONATION_CREDIT_DONATION_FIELD_ID,
+  DONATION_CREDIT_EXTERNAL_CREDIT_ID_FIELD_ID,
   DONATION_CREDIT_INCLUDE_IN_STATEMENT_FIELD_ID,
   DONATION_CREDIT_NAME_FIELD_ID,
   DONATION_CREDIT_OBJECT_ID,
@@ -37,6 +38,15 @@ export default defineObject({
       name: 'name',
       label: 'Name',
       icon: 'IconAbc',
+    },
+    {
+      universalIdentifier: DONATION_CREDIT_EXTERNAL_CREDIT_ID_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'externalCreditId',
+      label: 'External Credit ID',
+      icon: 'IconFingerprint',
+      isNullable: true,
+      isUnique: true,
     },
     {
       universalIdentifier: DONATION_CREDIT_CREDIT_TYPE_FIELD_ID,

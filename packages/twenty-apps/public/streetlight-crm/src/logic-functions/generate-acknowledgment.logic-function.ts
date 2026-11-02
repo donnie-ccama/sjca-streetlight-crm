@@ -18,6 +18,7 @@ type Donation = {
   amount?: { amountMicros?: string; currencyCode?: string };
   giftDate?: string;
   paymentMethod?: string;
+  acknowledgmentStatus?: string;
   tributeType?: string;
   tributeName?: string;
 };
@@ -70,6 +71,15 @@ const composeTaskBody = (donation: Donation, donorName: string): string => {
 
 const handler = async (event: DonationCreatedEvent) => {
   const donation = event.properties.after;
+
+  if (donation.acknowledgmentStatus !== 'PENDING') {
+    return {
+      donationId: donation.id,
+      skipped: true,
+      reason: `acknowledgment status is ${donation.acknowledgmentStatus ?? 'unset'}`,
+    };
+  }
+
   const client = new CoreApiClient();
 
   // Resolve the hard-credit donor (the Donation Credit with creditType = HARD
@@ -148,7 +158,7 @@ export default defineLogicFunction({
   universalIdentifier: GENERATE_ACKNOWLEDGMENT_LOGIC_FUNCTION_ID,
   name: 'generate-acknowledgment',
   description:
-    'Creates an acknowledgment Task (due in 7 days) for the hard-credit donor of a Donation. ' +
+    'Creates an acknowledgment Task (due in 7 days) for a Pending Donation hard-credit donor. ' +
     'Triggered automatically when a Donation is created. Also usable as a workflow action ' +
     'to generate acknowledgments on demand.',
   timeoutSeconds: 10,

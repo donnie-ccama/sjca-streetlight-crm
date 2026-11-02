@@ -1,2 +1,2 @@
 export const DEFAULT_WORKSPACE_LOGO =
-  'https://twentyhq.github.io/placeholder-images/workspaces/twenty-logo.png';
+  'https://streetlight.digital/brand/crm/streetlight-crm-app-icon-email.png';

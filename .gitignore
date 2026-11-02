@@ -98,3 +98,6 @@ screenshots/
 /.diag*.mjs
 /.compare*.mjs
 /.narrow*.mjs
+
+# Populated Streetlight deployment env files
+/deploy/streetlight/*.env

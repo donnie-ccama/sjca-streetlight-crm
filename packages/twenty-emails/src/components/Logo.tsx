@@ -12,10 +12,10 @@ type LogoProps = {
 export const Logo = ({ i18n }: LogoProps) => {
   return (
     <Img
-      src="https://app.twenty.com/images/icons/windows11/Square150x150Logo.scale-100.png"
-      alt={i18n._('Twenty logo')}
-      width="40"
-      height="40"
+      src="https://streetlight.digital/brand/crm/streetlight-crm-logo-email.png"
+      alt={i18n._('Streetlight CRM logo')}
+      width="180"
+      height="35"
       style={logoStyle}
     />
   );

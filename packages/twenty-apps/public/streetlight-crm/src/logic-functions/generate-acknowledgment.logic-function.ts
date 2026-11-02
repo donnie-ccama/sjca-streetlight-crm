@@ -18,9 +18,9 @@ type Donation = {
   amount?: { amountMicros?: string; currencyCode?: string };
   giftDate?: string;
   paymentMethod?: string;
+  acknowledgmentStatus?: string | null;
   tributeType?: string;
   tributeName?: string;
-  acknowledgmentStatus?: string | null;
 };
 
 type DonationCreatedEvent = DatabaseEventPayload<ObjectRecordCreateEvent<Donation>>;
@@ -70,19 +70,24 @@ const composeTaskBody = (donation: Donation, donorName: string): string => {
 };
 
 // Only PENDING gifts need a task. Imported historical gifts arrive as SENT or
-// DO_NOT_ACKNOWLEDGE. A missing status counts as PENDING.
+// DO_NOT_ACKNOWLEDGE. A missing, null, or blank status counts as PENDING,
+// because blank imports leave the column empty.
 export const shouldCreateAcknowledgmentTask = (
   donation: Pick<Donation, 'acknowledgmentStatus'>,
-): boolean =>
-  donation.acknowledgmentStatus === undefined ||
-  donation.acknowledgmentStatus === null ||
-  donation.acknowledgmentStatus === 'PENDING';
+): boolean => {
+  const status = donation.acknowledgmentStatus?.trim();
+  return !status || status === 'PENDING';
+};
 
 const handler = async (event: DonationCreatedEvent) => {
   const donation = event.properties.after;
 
   if (!shouldCreateAcknowledgmentTask(donation)) {
-    return { skipped: true, donationId: donation.id };
+    return {
+      donationId: donation.id,
+      skipped: true,
+      reason: `acknowledgment status is ${donation.acknowledgmentStatus ?? 'unset'}`,
+    };
   }
 
   const client = new CoreApiClient();
@@ -163,7 +168,7 @@ export default defineLogicFunction({
   universalIdentifier: GENERATE_ACKNOWLEDGMENT_LOGIC_FUNCTION_ID,
   name: 'generate-acknowledgment',
   description:
-    'Creates an acknowledgment Task (due in 7 days) for the hard-credit donor of a Donation. ' +
+    'Creates an acknowledgment Task (due in 7 days) for a Pending Donation hard-credit donor. ' +
     'Triggered automatically when a Donation is created. Also usable as a workflow action ' +
     'to generate acknowledgments on demand.',
   timeoutSeconds: 10,

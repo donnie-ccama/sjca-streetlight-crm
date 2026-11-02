@@ -18,7 +18,7 @@ type Donation = {
   amount?: { amountMicros?: string; currencyCode?: string };
   giftDate?: string;
   paymentMethod?: string;
-  acknowledgmentStatus?: string;
+  acknowledgmentStatus?: string | null;
   tributeType?: string;
   tributeName?: string;
 };
@@ -69,10 +69,19 @@ const composeTaskBody = (donation: Donation, donorName: string): string => {
   return lines.join('\n');
 };
 
+// Only PENDING gifts need a task. Imported historical gifts arrive as SENT or
+// DO_NOT_ACKNOWLEDGE. A missing status counts as PENDING.
+export const shouldCreateAcknowledgmentTask = (
+  donation: Pick<Donation, 'acknowledgmentStatus'>,
+): boolean =>
+  donation.acknowledgmentStatus === undefined ||
+  donation.acknowledgmentStatus === null ||
+  donation.acknowledgmentStatus === 'PENDING';
+
 const handler = async (event: DonationCreatedEvent) => {
   const donation = event.properties.after;
 
-  if (donation.acknowledgmentStatus !== 'PENDING') {
+  if (!shouldCreateAcknowledgmentTask(donation)) {
     return {
       donationId: donation.id,
       skipped: true,

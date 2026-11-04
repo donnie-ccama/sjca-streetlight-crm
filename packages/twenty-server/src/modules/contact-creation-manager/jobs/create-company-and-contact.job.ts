@@ -14,6 +14,7 @@ export type CreateCompanyAndContactJobData = {
     handle: string;
   }[];
   source: FieldActorSource;
+  isCompanyAutoCreationEnabled: boolean;
 };
 
 @Processor(MessageQueue.contactCreationQueue)
@@ -24,7 +25,13 @@ export class CreateCompanyAndContactJob {
 
   @Process(CreateCompanyAndContactJob.name)
   async handle(data: CreateCompanyAndContactJobData): Promise<void> {
-    const { workspaceId, connectedAccount, contactsToCreate, source } = data;
+    const {
+      workspaceId,
+      connectedAccount,
+      contactsToCreate,
+      source,
+      isCompanyAutoCreationEnabled,
+    } = data;
 
     await this.createCompanyAndPersonService.createCompaniesAndPeopleAndUpdateParticipants(
       connectedAccount,
@@ -34,6 +41,7 @@ export class CreateCompanyAndContactJob {
       })),
       workspaceId,
       source,
+      isCompanyAutoCreationEnabled,
     );
   }
 }

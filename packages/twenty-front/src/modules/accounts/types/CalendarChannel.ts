@@ -10,6 +10,7 @@ export type CalendarChannel = {
   handle: string;
   visibility: CalendarChannelVisibility;
   isContactAutoCreationEnabled: boolean;
+  isCompanyAutoCreationEnabled: boolean;
   contactAutoCreationPolicy: CalendarChannelContactAutoCreationPolicy;
   excludePrivateEvents: boolean;
   isSyncEnabled: boolean;

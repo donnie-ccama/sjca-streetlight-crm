@@ -135,6 +135,8 @@ export class CalendarEventParticipantService {
                   participant.displayName ?? participant.handle ?? '',
               })),
               source: FieldActorSource.CALENDAR,
+              isCompanyAutoCreationEnabled:
+                calendarChannel.isCompanyAutoCreationEnabled,
             },
           );
         }

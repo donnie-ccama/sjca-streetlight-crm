@@ -6,6 +6,7 @@ export const UPDATE_CALENDAR_CHANNEL = gql`
       id
       visibility
       isContactAutoCreationEnabled
+      isCompanyAutoCreationEnabled
       contactAutoCreationPolicy
       excludePrivateEvents
     }

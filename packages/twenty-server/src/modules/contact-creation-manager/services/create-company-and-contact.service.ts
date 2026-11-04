@@ -55,6 +55,7 @@ export class CreateCompanyAndPersonService {
     workspaceId: string,
     source: FieldActorSource,
     accountOwner: WorkspaceMemberWorkspaceEntity | null,
+    isCompanyAutoCreationEnabled: boolean,
   ): Promise<DeepPartial<PersonWorkspaceEntity>[]> {
     if (!contactsToCreate || contactsToCreate.length === 0) {
       return [];
@@ -121,13 +122,15 @@ export class CreateCompanyAndPersonService {
           source,
           connectedAccount,
           accountOwner,
+          isCompanyAutoCreationEnabled,
         );
 
-      const companiesMap =
-        await this.createCompaniesService.createOrRestoreCompanies(
-          workDomainNamesToCreate,
-          workspaceId,
-        );
+      const companiesMap = isCompanyAutoCreationEnabled
+        ? await this.createCompaniesService.createOrRestoreCompanies(
+            workDomainNamesToCreate,
+            workspaceId,
+          )
+        : {};
 
       const peopleToCreate = this.formatPeopleToCreateFromContacts({
         contactsToCreate: contactsThatNeedPersonCreate,
@@ -171,6 +174,7 @@ export class CreateCompanyAndPersonService {
     contactsToCreate: Contact[],
     workspaceId: string,
     source: FieldActorSource,
+    isCompanyAutoCreationEnabled: boolean,
   ) {
     const contactsBatches = chunk(
       contactsToCreate,
@@ -212,6 +216,7 @@ export class CreateCompanyAndPersonService {
           workspaceId,
           source,
           accountOwner,
+          isCompanyAutoCreationEnabled,
         );
       } catch (error) {
         // Concurrent imports can race on a unique company domain or person email; the record exists either way
@@ -234,6 +239,7 @@ export class CreateCompanyAndPersonService {
     source: FieldActorSource,
     connectedAccount: ConnectedAccountEntity,
     accountOwner: WorkspaceMemberWorkspaceEntity | null,
+    isCompanyAutoCreationEnabled: boolean,
   ) {
     const shouldCreateOrRestorePeopleByHandleMap = new Map<
       string,
@@ -307,8 +313,12 @@ export class CreateCompanyAndPersonService {
       shouldCreateOrRestorePeopleByHandleMap,
     );
 
+    const contactsForCompanies = isCompanyAutoCreationEnabled
+      ? [...contactsThatNeedPersonCreate, ...contactsThatNeedPersonRestore]
+      : [];
+
     const workDomainNamesToCreate = compact(
-      [...contactsThatNeedPersonCreate, ...contactsThatNeedPersonRestore]
+      contactsForCompanies
         .map((contact) => {
           const companyDomainName = isWorkEmail(contact.handle)
             ? getDomainNameFromHandle(contact.handle)

@@ -30,6 +30,11 @@ export class UpdateMessageChannelInputUpdates {
   isContactAutoCreationEnabled?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  @Field({ nullable: true })
+  isCompanyAutoCreationEnabled?: boolean;
+
+  @IsOptional()
   @IsEnum(MessageChannelContactAutoCreationPolicy)
   @Field(() => MessageChannelContactAutoCreationPolicy, { nullable: true })
   contactAutoCreationPolicy?: MessageChannelContactAutoCreationPolicy;

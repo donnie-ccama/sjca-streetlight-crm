@@ -9,6 +9,7 @@ export const GET_MY_MESSAGE_CHANNELS = gql`
       visibility
       type
       isContactAutoCreationEnabled
+      isCompanyAutoCreationEnabled
       contactAutoCreationPolicy
       messageFolderImportPolicy
       excludeNonProfessionalEmails

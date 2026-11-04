@@ -53,6 +53,10 @@ export class MessageChannelDTO {
   @Field()
   isContactAutoCreationEnabled: boolean;
 
+  @IsBoolean()
+  @Field()
+  isCompanyAutoCreationEnabled: boolean;
+
   @IsEnum(MessageChannelContactAutoCreationPolicy)
   @IsNotEmpty()
   @Field(() => MessageChannelContactAutoCreationPolicy)

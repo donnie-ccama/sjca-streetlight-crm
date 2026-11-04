@@ -14,6 +14,7 @@ export type MessageChannel = {
   visibility: MessageChannelVisibility;
   type: MessageChannelType;
   isContactAutoCreationEnabled: boolean;
+  isCompanyAutoCreationEnabled: boolean;
   contactAutoCreationPolicy: MessageChannelContactAutoCreationPolicy;
   messageFolderImportPolicy: MessageFolderImportPolicy;
   excludeNonProfessionalEmails: boolean;

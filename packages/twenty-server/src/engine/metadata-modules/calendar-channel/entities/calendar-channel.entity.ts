@@ -80,6 +80,9 @@ export class CalendarChannelEntity extends WorkspaceRelatedEntity {
   @Column({ type: 'boolean', nullable: false, default: true })
   isContactAutoCreationEnabled: boolean;
 
+  @Column({ type: 'boolean', nullable: false, default: true })
+  isCompanyAutoCreationEnabled: boolean;
+
   @Column({
     type: 'enum',
     enum: CalendarChannelContactAutoCreationPolicy,

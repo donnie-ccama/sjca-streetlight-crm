@@ -16,6 +16,7 @@ const mockedMessageChannel = {
   id: '20202020-ef5a-4822-9e08-ce6e6a4dcb6a',
   type: MessageChannelType.EMAIL,
   contactAutoCreationPolicy: MessageChannelContactAutoCreationPolicy.SENT,
+  isCompanyAutoCreationEnabled: true,
   excludeNonProfessionalEmails: true,
   excludeGroupEmails: false,
   isSyncEnabled: true,

@@ -6,6 +6,7 @@ export const UPDATE_MESSAGE_CHANNEL = gql`
       id
       visibility
       contactAutoCreationPolicy
+      isCompanyAutoCreationEnabled
       excludeNonProfessionalEmails
       excludeGroupEmails
       messageFolderImportPolicy

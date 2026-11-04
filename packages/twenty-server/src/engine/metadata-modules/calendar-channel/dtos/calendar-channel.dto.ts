@@ -50,6 +50,10 @@ export class CalendarChannelDTO {
   @Field()
   isContactAutoCreationEnabled: boolean;
 
+  @IsBoolean()
+  @Field()
+  isCompanyAutoCreationEnabled: boolean;
+
   @IsEnum(CalendarChannelContactAutoCreationPolicy)
   @IsNotEmpty()
   @Field(() => CalendarChannelContactAutoCreationPolicy)

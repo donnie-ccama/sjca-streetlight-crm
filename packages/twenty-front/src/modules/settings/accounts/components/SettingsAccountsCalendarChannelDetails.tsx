@@ -6,7 +6,11 @@ import { SettingsOptionCardContentSwitch } from '@/settings/components/SettingsO
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Section } from 'twenty-ui/components/layout';
-import { IconEyeOff, IconUserPlus } from 'twenty-ui/icon';
+import {
+  IconBuildingSkyscraper,
+  IconEyeOff,
+  IconUserPlus,
+} from 'twenty-ui/icon';
 import { Card } from 'twenty-ui/primitives/surfaces';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { type CalendarChannelVisibility } from '~/generated-metadata/graphql';
@@ -23,6 +27,7 @@ type SettingsAccountsCalendarChannelDetailsProps = {
     | 'id'
     | 'visibility'
     | 'isContactAutoCreationEnabled'
+    | 'isCompanyAutoCreationEnabled'
     | 'excludePrivateEvents'
     | 'isSyncEnabled'
   >;
@@ -45,6 +50,10 @@ export const SettingsAccountsCalendarChannelDetails = ({
 
   const handleContactAutoCreationToggle = (value: boolean) => {
     updateChannel({ isContactAutoCreationEnabled: value });
+  };
+
+  const handleCompanyAutoCreationToggle = (value: boolean) => {
+    updateChannel({ isCompanyAutoCreationEnabled: value });
   };
 
   const handleIsPrivateEventExcludedToggle = (value: boolean) => {
@@ -79,6 +88,18 @@ export const SettingsAccountsCalendarChannelDetails = ({
                 !calendarChannel.isContactAutoCreationEnabled,
               );
             }}
+            divider
+          />
+          <SettingsOptionCardContentSwitch
+            Icon={IconBuildingSkyscraper}
+            title={t`Create companies`}
+            description={t`Also create a Company from the email domain`}
+            checked={calendarChannel.isCompanyAutoCreationEnabled}
+            onChange={() =>
+              handleCompanyAutoCreationToggle(
+                !calendarChannel.isCompanyAutoCreationEnabled,
+              )
+            }
           />
         </Card.Root>
       </Section.Root>

@@ -33,6 +33,7 @@ export const mockedDropdownConnectedAccount: ConnectedAccount = {
       handle: 'account@example.com',
       visibility: CalendarChannelVisibility.SHARE_EVERYTHING,
       isContactAutoCreationEnabled: false,
+      isCompanyAutoCreationEnabled: true,
       contactAutoCreationPolicy: CalendarChannelContactAutoCreationPolicy.NONE,
       excludePrivateEvents: false,
       isSyncEnabled: true,

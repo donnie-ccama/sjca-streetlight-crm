@@ -29,6 +29,11 @@ export class UpdateCalendarChannelInputUpdates {
   isContactAutoCreationEnabled?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  @Field({ nullable: true })
+  isCompanyAutoCreationEnabled?: boolean;
+
+  @IsOptional()
   @IsEnum(CalendarChannelContactAutoCreationPolicy)
   @Field(() => CalendarChannelContactAutoCreationPolicy, { nullable: true })
   contactAutoCreationPolicy?: CalendarChannelContactAutoCreationPolicy;

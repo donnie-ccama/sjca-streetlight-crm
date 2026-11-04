@@ -189,6 +189,8 @@ export class MessagingSaveMessagesAndEnqueueContactCreationService {
           connectedAccount,
           contactsToCreate,
           source: FieldActorSource.EMAIL,
+          isCompanyAutoCreationEnabled:
+            messageChannel.isCompanyAutoCreationEnabled,
         },
       );
     }

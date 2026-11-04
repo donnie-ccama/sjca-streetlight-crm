@@ -220,3 +220,11 @@ export const RECOMPUTE_DONOR_ROLLUPS_LOGIC_FUNCTION_ID =
 
 export const UPDATE_DONOR_ROLLUP_ON_CREDIT_LOGIC_FUNCTION_ID =
   'f51e330f-16f8-43b4-88f8-b4d0a13fc70f';
+
+export const NAV_ITEM_DONATIONS_ID = '3f0a7c6e-9b1d-4e52-8a47-5d2c1b9e6f10';
+export const NAV_ITEM_HOUSEHOLDS_ID = '6c2e9d41-7a35-4f8b-9e16-2b8d4a7c3e21';
+export const NAV_ITEM_FUNDS_ID = '9a4b1e73-2c58-4d6f-b7a2-8e3f5c1d9b32';
+export const NAV_ITEM_PLEDGES_ID = 'c1d8f3a5-6e92-4b7c-a3d4-1f6e8b2c5a43';
+export const NAV_ITEM_FUNDRAISING_CAMPAIGNS_ID =
+  'e7b2c9d4-1f68-4a3e-8c5b-9d2a7e4f1c54';
+export const NAV_ITEM_CAMPAIGNS_ID = '2d9e6f1b-8c47-4e5a-b1d3-6a9c2f8e4b65';

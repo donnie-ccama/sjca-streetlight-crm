@@ -8,7 +8,11 @@ import {
   type MessageFolderImportPolicy,
 } from 'twenty-shared/types';
 import { Section } from 'twenty-ui/components/layout';
-import { IconBriefcase, IconUsers } from 'twenty-ui/icon';
+import {
+  IconBriefcase,
+  IconBuildingSkyscraper,
+  IconUsers,
+} from 'twenty-ui/icon';
 import { Card } from 'twenty-ui/primitives/surfaces';
 import { themeCssVariables } from 'twenty-ui/theme';
 
@@ -26,6 +30,7 @@ type SettingsAccountsMessageChannelDetailsProps = {
     | 'id'
     | 'visibility'
     | 'contactAutoCreationPolicy'
+    | 'isCompanyAutoCreationEnabled'
     | 'excludeNonProfessionalEmails'
     | 'excludeGroupEmails'
     | 'isSyncEnabled'
@@ -37,6 +42,7 @@ type SettingsAccountsMessageChannelDetailsProps = {
 type MessageChannelUpdateInput = Partial<{
   visibility: MessageChannelVisibility;
   contactAutoCreationPolicy: MessageChannelContactAutoCreationPolicy;
+  isCompanyAutoCreationEnabled: boolean;
   excludeGroupEmails: boolean;
   excludeNonProfessionalEmails: boolean;
   messageFolderImportPolicy: MessageFolderImportPolicy;
@@ -67,6 +73,10 @@ export const SettingsAccountsMessageChannelDetails = ({
     value: MessageChannelContactAutoCreationPolicy,
   ) => {
     updateChannel({ contactAutoCreationPolicy: value });
+  };
+
+  const handleCompanyAutoCreationToggle = (value: boolean) => {
+    updateChannel({ isCompanyAutoCreationEnabled: value });
   };
 
   const handleIsGroupEmailExcludedToggle = (value: boolean) => {
@@ -123,6 +133,19 @@ export const SettingsAccountsMessageChannelDetails = ({
           value={messageChannel.contactAutoCreationPolicy}
           onChange={handleContactAutoCreationChange}
         />
+        <Card.Root>
+          <SettingsOptionCardContentSwitch
+            Icon={IconBuildingSkyscraper}
+            title={t`Create companies`}
+            description={t`Also create a Company from the email domain`}
+            checked={messageChannel.isCompanyAutoCreationEnabled}
+            onChange={() =>
+              handleCompanyAutoCreationToggle(
+                !messageChannel.isCompanyAutoCreationEnabled,
+              )
+            }
+          />
+        </Card.Root>
       </Section.Root>
       <Section.Root>
         <Section.Header

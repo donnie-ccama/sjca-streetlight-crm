@@ -26,13 +26,13 @@ export default definePageLayout({
       widgets: [
         {
           universalIdentifier: WIDGET_ENTRY_FORM_ID,
-          title: 'Record gifts',
+          title: ' ',
           type: 'FRONT_COMPONENT',
           position: {
             layoutMode: PageLayoutTabLayoutMode.GRID,
             row: 0,
             column: 0,
-            rowSpan: 8,
+            rowSpan: 14,
             columnSpan: 12,
           },
           configuration: {
@@ -42,13 +42,13 @@ export default definePageLayout({
         },
         {
           universalIdentifier: WIDGET_TODAY_TABLE_ID,
-          title: "Today's Gifts",
+          title: ' ',
           type: 'FRONT_COMPONENT',
           position: {
             layoutMode: PageLayoutTabLayoutMode.GRID,
-            row: 8,
+            row: 14,
             column: 0,
-            rowSpan: 4,
+            rowSpan: 8,
             columnSpan: 12,
           },
           configuration: {

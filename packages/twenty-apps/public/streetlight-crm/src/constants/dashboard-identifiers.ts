@@ -70,3 +70,11 @@ export const DONATION_ACK_STATUS_FIELD_UID =
 export const DONATION_AMOUNT_FIELD_UID = '5f5c9183-c2ae-493b-b2b4-38c18e52bde9';
 export const DONATION_GIFT_DATE_FIELD_UID =
   '0d446a7b-c8a6-419f-a7d3-95e2a9675467';
+
+// ─── Streetlight dashboard component ───
+export const DONOR_DASHBOARD_FRONT_COMPONENT_ID =
+  '5daa74fa-acad-424d-8a27-1f13151fb172';
+export const WIDGET_DONOR_DASHBOARD_ID = 'ce4227b1-c7bb-492b-a175-2896a94076bd';
+export const GET_DONOR_DASHBOARD_CONTEXT_LF_ID =
+  '8b79f590-d68e-4df1-a0f6-9923d20a4e27';
+export const GET_DONOR_DASHBOARD_CONTEXT_ROUTE = '/donor-dashboard-context';

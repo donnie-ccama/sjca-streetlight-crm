@@ -5,11 +5,13 @@
 //
 // Pure TypeScript only: no React, no DOM, no Node built-ins.
 
+// App logic-function routes are served under this base path.
+export const FUNCTIONS_BASE_PATH = '/s';
 export const EXPORT_ROUTE_PATH = '/donor-dashboard-export';
 export const REPORT_QUERY_PARAM = 'report';
 
 export const buildStaticExportUrl = (reportKey: DashboardReportKey): string =>
-  `${EXPORT_ROUTE_PATH}?${REPORT_QUERY_PARAM}=${encodeURIComponent(reportKey)}`;
+  `${FUNCTIONS_BASE_PATH}${EXPORT_ROUTE_PATH}?${REPORT_QUERY_PARAM}=${encodeURIComponent(reportKey)}`;
 
 export const MAX_EXPORT_ROWS = 5_000;
 

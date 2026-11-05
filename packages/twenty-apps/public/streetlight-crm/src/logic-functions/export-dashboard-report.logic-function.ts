@@ -7,7 +7,6 @@ import {
   DASHBOARD_REPORT_SPECS,
   formatFullName,
   isDashboardReportKey,
-  MAX_EXPORT_ROWS,
   microsToDecimalString,
   REPORT_KEY_ACK_PENDING,
   REPORT_KEY_LAPSED,
@@ -17,105 +16,19 @@ import {
   REPORT_QUERY_PARAM,
   type DashboardReportKey,
 } from 'src/shared/dashboard-report-specs';
+import {
+  fetchLapsedPeople,
+  fetchMonthlyPoints,
+  fetchPendingAcknowledgments,
+  fetchSnapshot,
+  fetchTopDonors,
+  hardCreditDonorNames,
+} from 'src/logic-functions/donor-dashboard.server';
 
-// HTTP CSV export for the Donor Dashboard widgets. Each export-bar front
-// component renders a plain <a href> to this route; the browser downloads the
-// response straight to the user's Downloads folder (Content-Disposition:
-// attachment) without navigating away from Streetlight CRM. The route requires
-// authentication and the same-origin link carries the current session cookie.
-//
-// Queries are sent as RAW GraphQL strings over fetch instead of through the
-// generated CoreApiClient: the app-scoped schema this function runs against
-// does not include workspace-owned custom objects (dashboardSnapshots,
-// monthlyGivingPoints, donations), so the generated client rejects those
-// fields before the request is ever sent. Raw queries have no such
-// validation, matching scripts/bootstrap-dashboard.py.
-
-const PAGE_SIZE = 200;
-
-/** Sends one raw GraphQL request and returns `data`, throwing on errors. */
-const gql = async (
-  query: string,
-  variables: Record<string, unknown> = {},
-): Promise<Record<string, any>> => {
-  const base = process.env.TWENTY_API_URL;
-  // App access token when present; fall back to a configured API key.
-  const token =
-    process.env.TWENTY_APP_ACCESS_TOKEN ?? process.env.TWENTY_API_KEY;
-  if (!base || !token) {
-    throw new Error(
-      'Logic function env is missing TWENTY_API_URL or an access token (TWENTY_APP_ACCESS_TOKEN / TWENTY_API_KEY)',
-    );
-  }
-
-  let response: Response;
-  try {
-    response = await fetch(`${base.replace(/\/+$/, '')}/graphql`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ query, variables }),
-    });
-  } catch (error) {
-    throw new Error(
-      `Network error contacting Twenty API: ${error instanceof Error ? error.message : 'unknown'}`,
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(`Twenty API responded HTTP ${response.status}`);
-  }
-
-  const json = (await response.json()) as {
-    data?: Record<string, any>;
-    errors?: { message?: string }[];
-  };
-  if (json.errors?.length) {
-    throw new Error(
-      json.errors.map((e) => e.message ?? 'unknown GraphQL error').join('; '),
-    );
-  }
-  return json.data ?? {};
-};
-
-const escapeInQuery = (value: string): string =>
-  value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-
-interface GqlPageInfo {
-  hasNextPage?: boolean | null;
-  endCursor?: string | null;
-}
-
-/** Pages a connection until exhausted or the export row cap is reached. */
-const pageAll = async (
-  rootKey: string,
-  nodeFields: string,
-  firstPageArgs = '',
-): Promise<any[]> => {
-  const rows: any[] = [];
-  let after: string | undefined;
-  for (;;) {
-    const pageArgs = [
-      `first: ${PAGE_SIZE}`,
-      after ? `after: "${escapeInQuery(after)}"` : null,
-      firstPageArgs || null,
-    ]
-      .filter(Boolean)
-      .join(', ');
-    const data = await gql(
-      `{ ${rootKey}(${pageArgs}) { edges { node { ${nodeFields} } } pageInfo { hasNextPage endCursor } } }`,
-    );
-    const conn = data?.[rootKey];
-    for (const edge of conn?.edges ?? []) rows.push(edge.node);
-    if (rows.length >= MAX_EXPORT_ROWS) break;
-    const pageInfo: GqlPageInfo | undefined = conn?.pageInfo;
-    if (!pageInfo?.hasNextPage || !pageInfo.endCursor) break;
-    after = pageInfo.endCursor;
-  }
-  return rows.slice(0, MAX_EXPORT_ROWS);
-};
+// HTTP CSV export for the Donor Dashboard. The component renders a plain
+// <a href> to this route; the browser downloads the response as an
+// attachment without leaving the page. Auth is required and the
+// same-origin link carries the session cookie.
 
 const csvResponse = (filename: string, body: string) => ({
   __twentyHttpResponse: true as const,
@@ -135,28 +48,11 @@ const errorResponse = (status: number, message: string) => ({
   body: JSON.stringify({ error: message }),
 });
 
-// ─── Per-report queries — filters/sorts mirror the dashboard views ───
-
 type ReportRows = { filename: string; rows: string[][] };
-
-const oldestDateFirst = (a: string | null, b: string | null): number =>
-  (a ?? '9999-12-31').localeCompare(b ?? '9999-12-31');
-
-const PERSON_FIELDS = `
-  name { firstName lastName }
-  lastGiftDate
-  lifetimeHardGiving { amountMicros }
-`;
 
 const fetchSnapshotRows = async (): Promise<ReportRows> => {
   const spec = DASHBOARD_REPORT_SPECS[REPORT_KEY_SNAPSHOT];
-  const data = await gql(
-    `{ dashboardSnapshots(first: 1, filter: { snapshotKey: { eq: "CURRENT" } }) { edges { node {
-      ytdDonors ytdGiving { amountMicros } individualDonorsYtd companyDonorsYtd
-      activeDonors90d avgGift { amountMicros } computedAt
-    } } } }`,
-  );
-  const s = data?.dashboardSnapshots?.edges?.[0]?.node;
+  const s = await fetchSnapshot();
   return {
     filename: buildExportFilename(spec.filenamePrefix),
     rows: [
@@ -175,92 +71,58 @@ const fetchSnapshotRows = async (): Promise<ReportRows> => {
 
 const fetchMonthlyRows = async (): Promise<ReportRows> => {
   const spec = DASHBOARD_REPORT_SPECS[REPORT_KEY_MONTHLY];
-  const points = await pageAll(
-    'monthlyGivingPoints',
-    'periodLabel sortKey totalAmount { amountMicros } giftCount donorCount',
-  );
-  points.sort((a: any, b: any) => Number(b?.sortKey ?? 0) - Number(a?.sortKey ?? 0));
+  const points = await fetchMonthlyPoints();
   return {
     filename: buildExportFilename(spec.filenamePrefix),
-    rows: points.map((p: any) => [
-      p?.periodLabel ?? '',
-      microsToDecimalString(p?.totalAmount?.amountMicros ?? '0'),
-      String(p?.giftCount ?? 0),
-      String(p?.donorCount ?? 0),
+    rows: points.map((p) => [
+      p.periodLabel ?? '',
+      microsToDecimalString(p.totalAmount?.amountMicros ?? '0'),
+      String(p.giftCount ?? 0),
+      String(p.donorCount ?? 0),
     ]),
   };
 };
 
 const fetchLapsedRows = async (): Promise<ReportRows> => {
   const spec = DASHBOARD_REPORT_SPECS[REPORT_KEY_LAPSED];
-  const people = await pageAll(
-    'people',
-    `${PERSON_FIELDS} doNotSolicit`,
-    'filter: { isLapsed90d: { eq: "TRUE" } }',
-  );
-  // Oldest last-gift first, exactly like the Lapsed Donors view.
-  people.sort((a: any, b: any) => oldestDateFirst(a?.lastGiftDate, b?.lastGiftDate));
+  const people = await fetchLapsedPeople();
   return {
     filename: buildExportFilename(spec.filenamePrefix),
-    rows: people.map((p: any) => [
-      formatFullName(p?.name),
-      p?.lastGiftDate ?? '',
-      microsToDecimalString(p?.lifetimeHardGiving?.amountMicros ?? '0'),
-      p?.doNotSolicit ? 'TRUE' : 'FALSE',
+    rows: people.map((p) => [
+      formatFullName(p.name),
+      p.lastGiftDate ?? '',
+      microsToDecimalString(p.lifetimeHardGiving?.amountMicros ?? '0'),
+      p.doNotSolicit ? 'TRUE' : 'FALSE',
     ]),
   };
 };
 
 const fetchTopDonorRows = async (): Promise<ReportRows> => {
   const spec = DASHBOARD_REPORT_SPECS[REPORT_KEY_TOP_DONORS];
-  const people = await pageAll('people', PERSON_FIELDS);
-  people.sort(
-    (a: any, b: any) =>
-      Number(b?.lifetimeHardGiving?.amountMicros ?? 0) -
-      Number(a?.lifetimeHardGiving?.amountMicros ?? 0),
-  );
+  const people = await fetchTopDonors();
   return {
     filename: buildExportFilename(spec.filenamePrefix),
-    rows: people.map((p: any) => [
-      formatFullName(p?.name),
-      microsToDecimalString(p?.lifetimeHardGiving?.amountMicros ?? '0'),
-      p?.lastGiftDate ?? '',
+    rows: people.map((p) => [
+      formatFullName(p.name),
+      microsToDecimalString(p.lifetimeHardGiving?.amountMicros ?? '0'),
+      p.lastGiftDate ?? '',
     ]),
   };
 };
 
-const DONATION_FIELDS = `
-  name giftDate acknowledgmentStatus
-  amount { amountMicros }
-  company { name }
-  donationCredits { edges { node { creditType person { name { firstName lastName } } } } }
-`;
-
 const fetchAcknowledgmentRows = async (): Promise<ReportRows> => {
   const spec = DASHBOARD_REPORT_SPECS[REPORT_KEY_ACK_PENDING];
-  const donations = await pageAll(
-    'donations',
-    DONATION_FIELDS,
-    'filter: { acknowledgmentStatus: { eq: "PENDING" } }',
-  );
-  donations.sort((a: any, b: any) => oldestDateFirst(a?.giftDate, b?.giftDate));
+  const donations = await fetchPendingAcknowledgments();
   return {
     filename: buildExportFilename(spec.filenamePrefix),
-    rows: donations.map((d: any) => {
-      const hardCreditDonors = (d?.donationCredits?.edges ?? [])
-        .filter((e: any) => e?.node?.creditType === 'HARD')
-        .map((e: any) => formatFullName(e?.node?.person?.name))
-        .filter(Boolean)
-        .join('; ');
-      return [
-        d?.name ?? '',
-        d?.giftDate ?? '',
-        microsToDecimalString(d?.amount?.amountMicros ?? '0'),
-        d?.acknowledgmentStatus ?? '',
-        hardCreditDonors,
-        d?.company?.name ?? '',
-      ];
-    }),
+    rows: donations.map((d) => [
+      d.name ?? '',
+      d.giftDate ?? '',
+      microsToDecimalString(d.amount?.amountMicros ?? '0'),
+      d.acknowledgmentStatus ?? '',
+      hardCreditDonorNames(d),
+      d.company?.name ?? '',
+    ]),
   };
 };
 

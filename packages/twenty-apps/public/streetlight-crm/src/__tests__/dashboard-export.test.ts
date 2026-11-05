@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCsv,
   buildExportFilename,
+  buildStaticExportUrl,
   DASHBOARD_REPORT_SPECS,
   escapeCsvField,
   EXPORT_ROUTE_PATH,
@@ -117,5 +118,13 @@ describe('buildExportFilename', () => {
 describe('route contract', () => {
   it('exposes a stable export route path', () => {
     expect(EXPORT_ROUTE_PATH).toBe('/donor-dashboard-export');
+  });
+});
+
+describe('buildStaticExportUrl', () => {
+  it('points at the functions base path so the browser reaches the route', () => {
+    expect(buildStaticExportUrl(REPORT_KEY_SNAPSHOT)).toBe(
+      '/s/donor-dashboard-export?report=kpi-snapshot',
+    );
   });
 });

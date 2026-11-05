@@ -22,6 +22,18 @@ import {
   type DailyGiftDonorSource,
   type EntryResult,
 } from 'src/shared/daily-entry-specs';
+import {
+  CARD_GAP,
+  DANGER,
+  EMPTY,
+  INTERACTION_CSS,
+  initialOf,
+  STYLE,
+  SUCCESS,
+  tint,
+  WARNING,
+} from 'src/shared/daily-giving-styles';
+import { formatShortDate } from 'src/shared/donor-dashboard-specs';
 import type { DonorSuggestion } from 'src/shared/donor-suggestions';
 
 // ─────────────────────────── server types ──────────────────────────
@@ -89,61 +101,19 @@ const entryTitle = (entry: DayEntry): string =>
 
 // ───────────────────────────── styles ──────────────────────────────
 
-const COLORS = {
-  border: '#e5e7eb',
-  muted: '#6b7280',
-  fg: '#111827',
-  accent: '#4f46e5',
-  accentSoft: '#eef2ff',
-  danger: '#dc2626',
-  success: '#059669',
-};
+const SCOPE = 'sl-daily-entry';
 
-const inputStyle: React.CSSProperties = {
-  height: 32,
-  padding: '0 8px',
-  borderRadius: 6,
-  border: `1px solid ${COLORS.border}`,
-  fontSize: 13,
-  color: COLORS.fg,
-  background: '#ffffff',
-  boxSizing: 'border-box',
-  minWidth: 0,
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 600,
-  letterSpacing: '0.4px',
-  textTransform: 'uppercase',
-  color: COLORS.muted,
-  marginBottom: 2,
-};
-
-const buttonStyle = (primary: boolean): React.CSSProperties => ({
-  height: 32,
-  padding: '0 14px',
-  borderRadius: 6,
-  border: primary ? `1px solid ${COLORS.accent}` : `1px solid ${COLORS.border}`,
-  background: primary ? COLORS.accent : '#ffffff',
-  color: primary ? '#ffffff' : COLORS.fg,
-  fontSize: 13,
-  fontWeight: 500,
-  cursor: 'pointer',
-});
-
-const chipStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  padding: '2px 8px',
-  borderRadius: 999,
-  background: COLORS.accentSoft,
-  color: COLORS.accent,
-  fontSize: 11,
-  fontWeight: 500,
-  whiteSpace: 'nowrap',
-};
+const RESPONSIVE_CSS = `${INTERACTION_CSS(SCOPE)}
+.${SCOPE} .fields { display: grid; gap: 12px; grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr)); align-items: start; }
+.${SCOPE} .extras { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; }
+.${SCOPE} .suggestion:hover { background: var(--sl-surface); }
+@media (max-width: 1100px) {
+  .${SCOPE} .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .${SCOPE} .fields .donor { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .${SCOPE} .fields { grid-template-columns: 1fr; }
+}`;
 
 // ─────────────────────────── component ─────────────────────────────
 
@@ -289,7 +259,7 @@ const DailyDonationEntry = () => {
         ({ localId: _localId, displayLabel: _displayLabel, ...entry }) => entry,
       );
       const response = await api.post<BatchResponse>(
-        CREATE_DAILY_DONATIONS_ROUTE,
+        functionsPath(CREATE_DAILY_DONATIONS_ROUTE),
         { entries: payloadEntries },
       );
       const failedRows = new Set(
@@ -338,98 +308,100 @@ const DailyDonationEntry = () => {
   }, [totals]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
-        height: '100%',
-        width: '100%',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-        color: COLORS.fg,
-        boxSizing: 'border-box',
-        padding: 12,
-      }}
-    >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>Daily Giving</span>
-        <input
-          type="date"
-          value={date}
-          max={todayLocalDateString()}
-          onChange={(e) => {
-            const next = e.target.value;
-            if (isValidDateString(next)) setDate(next);
-          }}
-          style={{ ...inputStyle, width: 150 }}
-        />
-        {daySummary ? (
-          <span style={{ ...chipStyle }}>{daySummary}</span>
-        ) : null}
-        <div style={{ marginLeft: 'auto' }} />
-        {contextError ? (
-          <span style={{ color: COLORS.danger, fontSize: 12 }}>{contextError}</span>
-        ) : null}
+    <div className={SCOPE} style={STYLE.root}>
+      <style>{RESPONSIVE_CSS}</style>
+
+      {contextError ? (
+        <div role="alert" style={STYLE.alert}>
+          <span style={{ flex: 1, color: DANGER }}>{contextError}</span>
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => void loadContext(date)}
+            style={STYLE.ghostButton}
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
+
+      <div style={{ ...STYLE.cardHead, marginBottom: CARD_GAP }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', minWidth: 0 }}>
+          <input
+            type="date"
+            aria-label="Gift date"
+            value={date}
+            max={todayLocalDateString()}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (isValidDateString(next)) setDate(next);
+            }}
+            style={{ ...STYLE.input, width: 170 }}
+          />
+          <span style={STYLE.note}>{daySummary || 'Loading…'}</span>
+        </div>
       </div>
 
-      {/* Banner */}
       {banner ? (
         <div
+          role="status"
           style={{
-            padding: '6px 10px',
-            borderRadius: 6,
-            fontSize: 12,
-            background: banner.tone === 'ok' ? '#ecfdf5' : '#fffbeb',
-            border: `1px solid ${banner.tone === 'ok' ? '#a7f3d0' : '#fde68a'}`,
-            color: banner.tone === 'ok' ? COLORS.success : '#92400e',
+            ...STYLE.alert,
+            border: 'none',
+            fontWeight: 600,
+            color: banner.tone === 'ok' ? SUCCESS : WARNING,
+            background: tint(banner.tone === 'ok' ? SUCCESS : WARNING),
           }}
         >
           {banner.text}
         </div>
       ) : null}
 
-      {/* Entry form */}
-      <div
-        style={{
-          border: `1px solid ${COLORS.border}`,
-          borderRadius: 8,
-          padding: 10,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          background: '#fafafa',
-        }}
-      >
-        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div style={{ flex: '2 1 180px', position: 'relative', minWidth: 160 }}>
-            <div style={labelStyle}>Donor</div>
+      <div style={{ ...STYLE.card, marginBottom: CARD_GAP }}>
+        <div style={STYLE.cardHead}>
+          <div style={{ minWidth: 0 }}>
+            <h2 style={STYLE.cardTitle}>Record gifts</h2>
+            <div style={STYLE.hint}>
+              Press Enter to add a gift to the batch, then type the next one.
+            </div>
+          </div>
+        </div>
+
+        <div className="fields">
+          <div className="donor" style={{ position: 'relative', minWidth: 0 }}>
+            <span style={STYLE.fieldLabel}>Donor</span>
             {selectedDonor ? (
               <div
                 style={{
-                  padding: '5px 8px',
-                  border: `1px solid ${COLORS.border}`,
-                  borderRadius: 6,
-                  background: COLORS.accentSoft,
-                  fontSize: 12,
+                  padding: '9px 14px',
+                  borderRadius: 'var(--sl-radius-sm)',
+                  border: '1px solid var(--sl-hairline-strong)',
+                  background: 'var(--sl-surface)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <strong style={{ flex: 1 }}>
-                    {selectedDonor.type === 'COMPANY' ? '🏢 ' : ''}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={STYLE.avatar}>{initialOf(selectedDonor.label)}</span>
+                  <strong style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {selectedDonor.label}
                   </strong>
+                  {selectedDonor.type === 'COMPANY' ? (
+                    <span style={{ ...STYLE.pill, color: 'var(--sl-text-secondary)', background: 'var(--sl-bg)' }}>
+                      Organization
+                    </span>
+                  ) : null}
                   <button
+                    type="button"
                     onClick={clearDonor}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', color: COLORS.muted, padding: 0 }}
+                    style={STYLE.iconButton}
                     title="Clear donor"
+                    aria-label="Clear donor"
                   >
                     ✕
                   </button>
                 </div>
                 <div
                   data-testid="selected-donor-address"
-                  style={{ marginTop: 2, color: COLORS.muted, lineHeight: 1.35 }}
+                  style={{ marginTop: 6, paddingLeft: 30, fontSize: 12, color: 'var(--sl-text-secondary)', lineHeight: 1.35 }}
                 >
                   {(selectedDonor.addressLines ?? []).length > 0
                     ? (selectedDonor.addressLines ?? []).map((line) => (
@@ -440,12 +412,13 @@ const DailyDonationEntry = () => {
               </div>
             ) : (
               <input
+                aria-label="Donor"
                 placeholder="Search people or organizations…"
                 value={donorQuery}
                 onChange={(e) => setDonorQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                style={{ ...inputStyle, width: '100%' }}
+                style={STYLE.input}
               />
             )}
             {showSuggestions && suggestions.length > 0 ? (
@@ -456,10 +429,12 @@ const DailyDonationEntry = () => {
                   left: 0,
                   right: 0,
                   zIndex: 10,
-                  background: '#fff',
-                  border: `1px solid ${COLORS.border}`,
-                  borderRadius: 6,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  marginTop: 4,
+                  padding: 4,
+                  background: 'var(--sl-bg)',
+                  border: '1px solid var(--sl-hairline)',
+                  borderRadius: 'var(--sl-radius-sm)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,.14)',
                   overflow: 'hidden',
                 }}
               >
@@ -468,110 +443,101 @@ const DailyDonationEntry = () => {
                     key={`${s.type}-${s.id}`}
                     data-testid="donor-suggestion"
                     type="button"
+                    className="suggestion"
                     onMouseDown={() => pickDonor(s)}
                     style={{
-                      display: 'block',
+                      display: 'flex',
+                      alignItems: 'center',
                       width: '100%',
-                      padding: '6px 10px',
+                      padding: '8px 10px',
                       border: 0,
-                      background: '#fff',
+                      borderRadius: 8,
+                      background: 'transparent',
+                      color: 'var(--sl-text)',
                       font: 'inherit',
                       fontSize: 13,
                       textAlign: 'left',
                       cursor: 'pointer',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#f3f4f6';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                    }}
                   >
-                    <div style={{ fontWeight: 500 }}>{s.label}</div>
+                    <span style={STYLE.avatar}>{initialOf(s.label)}</span>
+                    <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.label}
+                    </span>
                   </button>
                 ))}
               </div>
             ) : null}
           </div>
 
-          <div style={{ width: 110 }}>
-            <div style={labelStyle}>{isInKind ? 'Est. value ($)' : 'Amount ($)'}</div>
+          <label style={{ minWidth: 0 }}>
+            <span style={STYLE.fieldLabel}>{isInKind ? 'Est. value ($)' : 'Amount ($)'}</span>
             <input
               placeholder="0.00"
+              inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') stageCurrentRow();
               }}
-              style={{ ...inputStyle, width: '100%' }}
+              style={STYLE.input}
             />
-          </div>
+          </label>
 
-          <div style={{ width: 130 }}>
-            <div style={labelStyle}>Income stream</div>
-            <select
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-              style={{ ...inputStyle, width: '100%' }}
-            >
+          <label style={{ minWidth: 0 }}>
+            <span style={STYLE.fieldLabel}>Income stream</span>
+            <select value={method} onChange={(e) => setMethod(e.target.value)} style={STYLE.input}>
               {PAYMENT_METHODS.map((m) => (
                 <option key={m.value} value={m.value}>
                   {m.label}
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div style={{ width: 170 }}>
-            <div style={labelStyle}>Fund</div>
-            <select
-              value={fundId}
-              onChange={(e) => setFundId(e.target.value)}
-              style={{ ...inputStyle, width: '100%' }}
-            >
-              <option value="">— none —</option>
+          <label style={{ minWidth: 0 }}>
+            <span style={STYLE.fieldLabel}>Fund</span>
+            <select value={fundId} onChange={(e) => setFundId(e.target.value)} style={STYLE.input}>
+              <option value="">None</option>
               {funds.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name}{f.isRestricted ? ' 🔒' : ''}
+                  {f.name}
+                  {f.isRestricted ? ' (restricted)' : ''}
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          <div style={{ width: 170 }}>
-            <div style={labelStyle}>Campaign</div>
-            <select
-              value={campaignId}
-              onChange={(e) => setCampaignId(e.target.value)}
-              style={{ ...inputStyle, width: '100%' }}
-            >
-              <option value="">— none —</option>
+          <label style={{ minWidth: 0 }}>
+            <span style={STYLE.fieldLabel}>Campaign</span>
+            <select value={campaignId} onChange={(e) => setCampaignId(e.target.value)} style={STYLE.input}>
+              <option value="">None</option>
               {campaigns.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
             </select>
-          </div>
+          </label>
         </div>
 
-        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <div className="extras">
           {method === 'CHECK' ? (
-            <div style={{ width: 120 }}>
-              <div style={labelStyle}>Check #</div>
+            <label style={{ width: 160 }}>
+              <span style={STYLE.fieldLabel}>Check #</span>
               <input
                 value={checkNumber}
                 onChange={(e) => setCheckNumber(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') stageCurrentRow();
                 }}
-                style={{ ...inputStyle, width: '100%' }}
+                style={STYLE.input}
               />
-            </div>
+            </label>
           ) : null}
           {isInKind ? (
-            <div style={{ flex: '1 1 240px' }}>
-              <div style={labelStyle}>What was donated?</div>
+            <label style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <span style={STYLE.fieldLabel}>What was donated?</span>
               <input
                 placeholder="e.g. 40 cases of water, 12 backpacks"
                 value={inKindDescription}
@@ -579,43 +545,52 @@ const DailyDonationEntry = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') stageCurrentRow();
                 }}
-                style={{ ...inputStyle, width: '100%' }}
+                style={STYLE.input}
               />
-            </div>
-          ) : (
-            <div style={{ flex: 1, fontSize: 11, color: COLORS.muted }}>
-              Tip: press Enter to add this gift to the batch, then keep typing the next one.
-            </div>
-          )}
-          <button onClick={stageCurrentRow} style={buttonStyle(false)}>
+            </label>
+          ) : null}
+          <div style={{ flex: 1 }} />
+          <button type="button" className="secondary" onClick={stageCurrentRow} style={STYLE.secondaryButton}>
             + Add to batch
           </button>
         </div>
 
         {rowErrors.length > 0 ? (
-          <div style={{ color: COLORS.danger, fontSize: 12 }}>
+          <div role="alert" style={{ color: DANGER, fontSize: 12, fontWeight: 600, marginTop: 12 }}>
             {rowErrors.join(' · ')}
           </div>
         ) : null}
       </div>
 
-      {/* Batch strip */}
       {staged.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600 }}>
-              Batch ({staged.length})
-            </span>
-            <button onClick={submitBatch} disabled={submitting} style={buttonStyle(true)}>
-              {submitting ? 'Recording…' : `Record ${staged.length} gift${staged.length === 1 ? '' : 's'}`}
-            </button>
-            <button
-              onClick={() => setStaged([])}
-              disabled={submitting}
-              style={{ ...buttonStyle(false), borderColor: 'transparent', color: COLORS.muted }}
-            >
-              Clear
-            </button>
+        <div style={{ ...STYLE.card, marginBottom: CARD_GAP }}>
+          <div style={STYLE.cardHead}>
+            <div style={{ minWidth: 0 }}>
+              <h2 style={STYLE.cardTitle}>Batch</h2>
+              <div style={STYLE.hint}>
+                {staged.length} gift{staged.length === 1 ? '' : 's'} ready to record
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="ghost"
+                onClick={() => setStaged([])}
+                disabled={submitting}
+                style={STYLE.ghostButton}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                className="primary"
+                onClick={submitBatch}
+                disabled={submitting}
+                style={STYLE.primaryButton}
+              >
+                {submitting ? 'Recording…' : `Record ${staged.length} gift${staged.length === 1 ? '' : 's'}`}
+              </button>
+            </div>
           </div>
           {staged.map((row) => (
             <div
@@ -624,20 +599,20 @@ const DailyDonationEntry = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                fontSize: 12,
-                padding: '3px 8px',
-                borderRadius: 6,
-                background: COLORS.accentSoft,
+                padding: '8px 0',
+                borderBottom: '1px solid var(--sl-hairline)',
               }}
             >
-              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {row.displayLabel}
               </span>
               <button
+                type="button"
                 onClick={() => setStaged((rows) => rows.filter((r) => r.localId !== row.localId))}
                 disabled={submitting}
-                style={{ border: 'none', background: 'none', cursor: 'pointer', color: COLORS.muted, padding: 0 }}
+                style={STYLE.iconButton}
                 title="Remove from batch"
+                aria-label="Remove from batch"
               >
                 ✕
               </button>
@@ -646,55 +621,63 @@ const DailyDonationEntry = () => {
         </div>
       ) : null}
 
-      {/* Logged today */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
-          Recorded on {context?.day.date ?? date}
+      <div style={STYLE.card}>
+        <div style={STYLE.cardHead}>
+          <div style={{ minWidth: 0 }}>
+            <h2 style={STYLE.cardTitle}>
+              Recorded on {formatShortDate(context?.day.date ?? date)}
+            </h2>
+            <div style={STYLE.hint}>{daySummary || ' '}</div>
+          </div>
         </div>
-        {!context ? (
-          <span style={{ fontSize: 12, color: COLORS.muted }}>Loading…</span>
-        ) : context.day.entries.length === 0 ? (
-          <span style={{ fontSize: 12, color: COLORS.muted }}>
-            No gifts recorded yet for this day.
-          </span>
-        ) : (
-          <div style={{ overflowY: 'auto', minHeight: 0 }}>
-            {totals && Object.keys(totals.byMethod).length > 0 ? (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '2px 0 6px' }}>
-                {Object.entries(totals.byMethod).map(([value, bucket]) => (
-                  <span key={value} style={chipStyle}>
-                    {paymentMethodLabel(value)}: {bucket.count} × {formatMicrosToUsd(bucket.amountMicros)}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-            {context.day.entries.map((entry) => (
-              <div
-                key={entry.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 12,
-                  padding: '4px 2px',
-                  borderBottom: `1px solid ${COLORS.border}`,
-                }}
+        {totals && Object.keys(totals.byMethod).length > 0 ? (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+            {Object.entries(totals.byMethod).map(([value, bucket]) => (
+              <span
+                key={value}
+                style={{ ...STYLE.pill, color: 'var(--sl-text)', border: '1px solid var(--sl-hairline-strong)' }}
               >
-                <span style={{ width: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: COLORS.muted }}>
-                  {donorChip(entry)}
-                </span>
-                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {entryTitle(entry)}
-                </span>
-                {entry.fund?.name ? (
-                  <span style={{ color: COLORS.muted, whiteSpace: 'nowrap' }}>{entry.fund.name}</span>
-                ) : null}
-                <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
-                  {formatMicrosToUsd(entry.amount?.amountMicros ?? '0')}
-                </span>
-              </div>
+                {paymentMethodLabel(value)}: {bucket.count} × {formatMicrosToUsd(bucket.amountMicros)}
+              </span>
             ))}
           </div>
+        ) : null}
+        {!context ? (
+          <div style={STYLE.muted}>Loading…</div>
+        ) : context.day.entries.length === 0 ? (
+          <div style={STYLE.muted}>No gifts recorded yet for this day.</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontVariantNumeric: 'tabular-nums' }}>
+            <thead>
+              <tr>
+                <th style={{ ...STYLE.th, width: '30%' }}>Donor</th>
+                <th style={STYLE.th}>Gift</th>
+                <th style={{ ...STYLE.th, width: '22%' }}>Fund</th>
+                <th style={{ ...STYLE.th, width: 110, textAlign: 'right', paddingRight: 0 }}>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {context.day.entries.map((entry) => (
+                <tr key={entry.id} className="row">
+                  <td style={STYLE.td} title={donorChip(entry)}>
+                    <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                      <span style={STYLE.avatar}>{initialOf(donorChip(entry))}</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{donorChip(entry)}</span>
+                    </span>
+                  </td>
+                  <td style={STYLE.td} title={entryTitle(entry)}>
+                    {entryTitle(entry)}
+                  </td>
+                  <td style={{ ...STYLE.td, color: entry.fund?.name ? 'var(--sl-text)' : 'var(--sl-text-secondary)' }}>
+                    {entry.fund?.name ?? EMPTY}
+                  </td>
+                  <td style={{ ...STYLE.td, textAlign: 'right', paddingRight: 0, fontWeight: 600 }}>
+                    {formatMicrosToUsd(entry.amount?.amountMicros ?? '0')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

@@ -13,6 +13,16 @@ import {
   todayLocalDateString,
   type DailyGiftDonorSource,
 } from 'src/shared/daily-entry-specs';
+import {
+  DANGER,
+  EMPTY,
+  INTERACTION_CSS,
+  initialOf,
+  statusPillColor,
+  STYLE,
+  tint,
+} from 'src/shared/daily-giving-styles';
+import { formatShortDate } from 'src/shared/donor-dashboard-specs';
 
 interface DailyGift extends DailyGiftDonorSource {
   id: string;
@@ -37,37 +47,7 @@ interface DailyGivingContext {
 
 const api = new RestApiClient();
 
-const COLORS = {
-  border: '#e5e7eb',
-  muted: '#6b7280',
-  fg: '#111827',
-  accent: '#4f46e5',
-  danger: '#b91c1c',
-  header: '#f9fafb',
-};
-
-const cellStyle: React.CSSProperties = {
-  padding: '8px 10px',
-  borderBottom: `1px solid ${COLORS.border}`,
-  fontSize: 12,
-  lineHeight: 1.35,
-  textAlign: 'left',
-  verticalAlign: 'middle',
-};
-
-const headerCellStyle: React.CSSProperties = {
-  ...cellStyle,
-  position: 'sticky',
-  top: 0,
-  zIndex: 1,
-  color: COLORS.muted,
-  background: COLORS.header,
-  fontSize: 10,
-  fontWeight: 600,
-  letterSpacing: '0.4px',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
-};
+const SCOPE = 'sl-today-gifts';
 
 const giftLabel = (gift: DailyGift): string =>
   gift.inKindDescription?.trim() || gift.name?.trim() || 'Gift';
@@ -79,7 +59,7 @@ const statusLabel = (value?: string | null): string =>
         .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ')
-    : '—';
+    : EMPTY;
 
 const TodayGiftsTable = () => {
   const date = todayLocalDateString();
@@ -118,146 +98,114 @@ const TodayGiftsTable = () => {
   const entries = context?.day.entries ?? [];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        minHeight: 0,
-        color: COLORS.fg,
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          padding: '8px 10px',
-          borderBottom: `1px solid ${COLORS.border}`,
-        }}
-      >
-        <span style={{ color: COLORS.muted, fontSize: 12 }}>
-          {context
-            ? `${context.day.totals.giftCount} gift${context.day.totals.giftCount === 1 ? '' : 's'} · ${formatMicrosToUsd(context.day.totals.amountMicros)}`
-            : date}
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            setLoading(true);
-            void loadGifts();
-          }}
-          disabled={loading}
-          style={{
-            marginLeft: 'auto',
-            minHeight: 30,
-            padding: '4px 10px',
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: 6,
-            color: loading ? COLORS.muted : COLORS.accent,
-            background: '#ffffff',
-            font: 'inherit',
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: loading ? 'default' : 'pointer',
-          }}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
-      </div>
-
-      {error ? (
-        <div
-          role="alert"
-          style={{ padding: 12, color: COLORS.danger, fontSize: 12 }}
-        >
-          {error}. Select Refresh to try again.
-        </div>
-      ) : null}
-
-      {loading && !context ? (
-        <div aria-live="polite" style={{ padding: 12, color: COLORS.muted, fontSize: 12 }}>
-          Loading today’s gifts…
-        </div>
-      ) : error && !context ? null : entries.length === 0 ? (
-        <div style={{ padding: 12, color: COLORS.muted, fontSize: 12 }}>
-          No gifts recorded today.
-        </div>
-      ) : (
-        <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              minWidth: 900,
-              borderCollapse: 'collapse',
-              tableLayout: 'fixed',
-              fontVariantNumeric: 'tabular-nums',
+    <div className={SCOPE} style={STYLE.root}>
+      <style>{INTERACTION_CSS(SCOPE)}</style>
+      <div style={STYLE.card}>
+        <div style={STYLE.cardHead}>
+          <div style={{ minWidth: 0 }}>
+            <h2 style={STYLE.cardTitle}>Today’s Gifts</h2>
+            <div style={STYLE.hint}>
+              {context
+                ? `${context.day.totals.giftCount} gift${context.day.totals.giftCount === 1 ? '' : 's'} · ${formatMicrosToUsd(context.day.totals.amountMicros)}`
+                : formatShortDate(date)}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => {
+              setLoading(true);
+              void loadGifts();
             }}
+            disabled={loading}
+            style={STYLE.ghostButton}
           >
-            <thead>
-              <tr>
-                <th style={{ ...headerCellStyle, width: 220 }}>Gift</th>
-                <th style={{ ...headerCellStyle, width: 190 }}>Donor</th>
-                <th style={{ ...headerCellStyle, width: 110 }}>Amount</th>
-                <th style={{ ...headerCellStyle, width: 130 }}>Income stream</th>
-                <th style={{ ...headerCellStyle, width: 150 }}>Fund</th>
-                <th style={{ ...headerCellStyle, width: 150 }}>Acknowledgment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((gift) => (
-                <tr key={gift.id}>
-                  <td
-                    title={giftLabel(gift)}
-                    style={{
-                      ...cellStyle,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {giftLabel(gift)}
-                  </td>
-                  <td
-                    title={dailyGiftDonorLabel(gift)}
-                    style={{
-                      ...cellStyle,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {dailyGiftDonorLabel(gift)}
-                  </td>
-                  <td style={{ ...cellStyle, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {formatMicrosToUsd(gift.amount?.amountMicros ?? '0')}
-                  </td>
-                  <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>
-                    {paymentMethodLabel(gift.paymentMethod ?? 'OTHER')}
-                  </td>
-                  <td
-                    title={gift.fund?.name ?? undefined}
-                    style={{
-                      ...cellStyle,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      color: gift.fund?.name ? COLORS.fg : COLORS.muted,
-                    }}
-                  >
-                    {gift.fund?.name ?? '—'}
-                  </td>
-                  <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>
-                    {statusLabel(gift.acknowledgmentStatus)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            {loading ? 'Refreshing…' : 'Refresh'}
+          </button>
         </div>
-      )}
+
+        {error ? (
+          <div role="alert" style={{ ...STYLE.muted, color: DANGER }}>
+            {error}. Select Refresh to try again.
+          </div>
+        ) : null}
+
+        {loading && !context ? (
+          <div aria-live="polite" style={STYLE.muted}>
+            Loading today’s gifts…
+          </div>
+        ) : error && !context ? null : entries.length === 0 ? (
+          <div style={STYLE.muted}>No gifts recorded today.</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              style={{
+                width: '100%',
+                minWidth: 860,
+                borderCollapse: 'collapse',
+                tableLayout: 'fixed',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ ...STYLE.th, width: 220 }}>Gift</th>
+                  <th style={{ ...STYLE.th, width: 200 }}>Donor</th>
+                  <th style={{ ...STYLE.th, width: 110, textAlign: 'right', paddingRight: 24 }}>Amount</th>
+                  <th style={{ ...STYLE.th, width: 130 }}>Income stream</th>
+                  <th style={{ ...STYLE.th, width: 150 }}>Fund</th>
+                  <th style={{ ...STYLE.th, width: 150, paddingRight: 0 }}>Acknowledgment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((gift) => (
+                  <tr key={gift.id} className="row">
+                    <td title={giftLabel(gift)} style={{ ...STYLE.td, fontWeight: 500 }}>
+                      {giftLabel(gift)}
+                    </td>
+                    <td title={dailyGiftDonorLabel(gift)} style={STYLE.td}>
+                      <span style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                        <span style={STYLE.avatar}>{initialOf(dailyGiftDonorLabel(gift))}</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {dailyGiftDonorLabel(gift)}
+                        </span>
+                      </span>
+                    </td>
+                    <td style={{ ...STYLE.td, textAlign: 'right', paddingRight: 24, fontWeight: 600 }}>
+                      {formatMicrosToUsd(gift.amount?.amountMicros ?? '0')}
+                    </td>
+                    <td style={STYLE.td}>{paymentMethodLabel(gift.paymentMethod ?? 'OTHER')}</td>
+                    <td
+                      title={gift.fund?.name ?? undefined}
+                      style={{
+                        ...STYLE.td,
+                        color: gift.fund?.name ? 'var(--sl-text)' : 'var(--sl-text-secondary)',
+                      }}
+                    >
+                      {gift.fund?.name ?? EMPTY}
+                    </td>
+                    <td style={{ ...STYLE.td, paddingRight: 0 }}>
+                      {gift.acknowledgmentStatus ? (
+                        <span
+                          style={{
+                            ...STYLE.pill,
+                            color: statusPillColor(gift.acknowledgmentStatus),
+                            background: tint(statusPillColor(gift.acknowledgmentStatus)),
+                          }}
+                        >
+                          {statusLabel(gift.acknowledgmentStatus)}
+                        </span>
+                      ) : (
+                        EMPTY
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

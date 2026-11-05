@@ -75,6 +75,50 @@ async function upsertByUniqueField(
   return 'created';
 }
 
+export function aggregateDonations(donations: any[], ninetyDaysAgo: string) {
+  const individualDonors = new Set<string>();
+  const companyDonors = new Set<string>();
+  const householdDonors = new Set<string>();
+  const activeDonors = new Set<string>();
+  const monthAgg = new Map<string, { micros: bigint; gifts: number; donors: Set<string> }>();
+  let totalMicros = 0n;
+
+  for (const d of donations) {
+    const micros = BigInt(d?.amount?.amountMicros ?? '0');
+    totalMicros += micros;
+
+    const creditPersonIds = (d?.donationCredits?.edges ?? [])
+      .map((e: any) => e?.node?.person?.id)
+      .filter(Boolean);
+    const donorKeys: string[] = [...creditPersonIds];
+
+    for (const pid of creditPersonIds) individualDonors.add(pid);
+    if (d?.company?.id) {
+      companyDonors.add(d.company.id);
+      donorKeys.push(`c:${d.company.id}`);
+    }
+    if (d?.household?.id) {
+      householdDonors.add(d.household.id);
+      donorKeys.push(`h:${d.household.id}`);
+    }
+
+    const ym = String(d?.giftDate ?? '').slice(0, 7);
+    if (ym) {
+      const agg = monthAgg.get(ym) ?? { micros: 0n, gifts: 0, donors: new Set<string>() };
+      agg.micros += micros;
+      agg.gifts += 1;
+      for (const key of donorKeys) agg.donors.add(key);
+      monthAgg.set(ym, agg);
+    }
+
+    if (d?.giftDate && d.giftDate >= ninetyDaysAgo) {
+      for (const key of donorKeys) activeDonors.add(key);
+    }
+  }
+
+  return { individualDonors, companyDonors, householdDonors, activeDonors, monthAgg, totalMicros };
+}
+
 const handler = async () => {
   const year = new Date().getFullYear();
   const ninetyDaysAgo = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10);
@@ -87,6 +131,7 @@ const handler = async () => {
         amount: { amountMicros: true },
         giftDate: true,
         company: { id: true },
+        household: { id: true },
         donationCredits: { edges: { node: { person: { id: true } } } },
       },
     },
@@ -108,39 +153,9 @@ const handler = async () => {
     return { skipped: true, reason: 'no donations or people found' };
   }
 
-  // ── Aggregate YTD giving ───────────────────────────────────────────
-  const individualDonors = new Set<string>();
-  const companyDonors = new Set<string>();
-  const activeDonors = new Set<string>();
-  const monthAgg = new Map<string, { micros: bigint; gifts: number; donors: Set<string> }>();
-  let totalMicros = 0n;
-
-  for (const d of donations) {
-    const micros = BigInt(d?.amount?.amountMicros ?? '0');
-    totalMicros += micros;
-
-    const creditPersonIds = (d?.donationCredits?.edges ?? [])
-      .map((e: any) => e?.node?.person?.id)
-      .filter(Boolean);
-
-    for (const pid of creditPersonIds) individualDonors.add(pid);
-    if (d?.company?.id) companyDonors.add(d.company.id);
-
-    const ym = String(d?.giftDate ?? '').slice(0, 7);
-    if (ym) {
-      const agg = monthAgg.get(ym) ?? { micros: 0n, gifts: 0, donors: new Set<string>() };
-      agg.micros += micros;
-      agg.gifts += 1;
-      for (const pid of creditPersonIds) agg.donors.add(pid);
-      if (d?.company?.id) agg.donors.add(`c:${d.company.id}`);
-      monthAgg.set(ym, agg);
-    }
-
-    if (d?.giftDate && d.giftDate >= ninetyDaysAgo) {
-      for (const pid of creditPersonIds) activeDonors.add(pid);
-      if (d?.company?.id) activeDonors.add(`c:${d.company.id}`);
-    }
-  }
+  const { individualDonors, companyDonors, householdDonors, activeDonors, monthAgg, totalMicros } =
+    aggregateDonations(donations, ninetyDaysAgo);
+  const ytdDonorCount = individualDonors.size + companyDonors.size + householdDonors.size;
 
   const donationCount = donations.length || 1;
   const avgMicros = totalMicros / BigInt(donationCount);
@@ -183,7 +198,7 @@ const handler = async () => {
     'CURRENT',
     {
       computedAt: new Date().toISOString(),
-      ytdDonors: individualDonors.size + companyDonors.size,
+      ytdDonors: ytdDonorCount,
       individualDonorsYtd: individualDonors.size,
       companyDonorsYtd: companyDonors.size,
       activeDonors90d: activeDonors.size,
@@ -217,9 +232,10 @@ const handler = async () => {
   return {
     donationsProcessed: donations.length,
     peopleConsidered: people.length,
-    ytdDonors: individualDonors.size + companyDonors.size,
+    ytdDonors: ytdDonorCount,
     individualDonorsYtd: individualDonors.size,
     companyDonorsYtd: companyDonors.size,
+    householdDonorsYtd: householdDonors.size,
     activeDonors90d: activeDonors.size,
     lapsedDonors: lapsedCount,
     ytdGivingMicros: totalMicros.toString(),
@@ -233,7 +249,7 @@ export default defineLogicFunction({
   universalIdentifier: '7c2d9e4a-8b31-4f6a-9d25-e1a7c3f84b52',
   name: 'refresh-donor-dashboard',
   description:
-    'Recomputes Donor Dashboard metrics (YTD donors incl. companies, monthly breakdown, lapsed flags) into dashboardSnapshot/monthlyGivingPoint rows shown by native dashboard widgets. Hourly cron; also runnable manually.',
+    'Recomputes Donor Dashboard metrics (YTD donors incl. companies and households, monthly breakdown, lapsed flags) into dashboardSnapshot/monthlyGivingPoint rows shown by native dashboard widgets. Hourly cron; also runnable manually.',
   timeoutSeconds: 300,
   handler,
   cronTriggerSettings: {

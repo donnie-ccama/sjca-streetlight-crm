@@ -1,0 +1,46 @@
+{
+  "id": "evt_test_9",
+  "object": "event",
+  "api_version": "2026-10-28.endive",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.payment_failed",
+  "data": {
+    "object": {
+      "id": "in_test_2",
+      "object": "invoice",
+      "status": "open",
+      "currency": "usd",
+      "amount_due": 2500,
+      "amount_paid": 0,
+      "billing_reason": "subscription_cycle",
+      "customer": "cus_test_sub",
+      "customer_email": "donor@example.com",
+      "created": 1793899950,
+      "parent": {
+        "type": "subscription_details",
+        "quote_details": null,
+        "subscription_details": {
+          "subscription": "sub_test_1",
+          "metadata": {
+            "lp_slug": "give",
+            "invite_code": "abc123"
+          }
+        }
+      },
+      "payments": null,
+      "lines": {
+        "object": "list",
+        "has_more": false,
+        "data": []
+      },
+      "attempt_count": 1,
+      "next_payment_attempt": 1794300000
+    }
+  }
+}

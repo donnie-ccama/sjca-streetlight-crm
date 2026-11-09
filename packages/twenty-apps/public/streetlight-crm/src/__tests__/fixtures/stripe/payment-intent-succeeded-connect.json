@@ -1,0 +1,37 @@
+{
+  "id": "evt_test_connect_pi",
+  "object": "event",
+  "api_version": "2025-08-27.basil",
+  "created": 1793900200,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": { "id": null, "idempotency_key": null },
+  "type": "payment_intent.succeeded",
+  "data": {
+    "object": {
+      "id": "pi_test_connect",
+      "object": "payment_intent",
+      "status": "succeeded",
+      "amount": 2500,
+      "amount_received": 2500,
+      "currency": "usd",
+      "created": 1793900190,
+      "customer": null,
+      "application": "ca_test_app",
+      "receipt_email": null,
+      "metadata": { "partner_ref": "ref_test_1" },
+      "latest_charge": {
+        "id": "ch_test_connect",
+        "object": "charge",
+        "created": 1793900195,
+        "payment_method_details": { "type": "card" },
+        "billing_details": {
+          "name": "Test Donor",
+          "email": null,
+          "phone": null
+        },
+        "balance_transaction": { "id": "txn_test_connect", "fee": 103 }
+      }
+    }
+  }
+}

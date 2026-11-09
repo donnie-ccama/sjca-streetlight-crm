@@ -21,10 +21,10 @@
 //
 // GraphQL enums must be wrapped: gqlEnum('HARD') serializes to HARD (no quotes).
 
-/** Sends one raw GraphQL request to the workspace and returns `data`. */
-export const gql = async (
+const postGraphql = async (
+  endpoint: 'graphql' | 'metadata',
   query: string,
-  variables: Record<string, unknown> = {},
+  variables: Record<string, unknown>,
 ): Promise<Record<string, any>> => {
   const base = process.env.TWENTY_API_URL;
   const authToken =
@@ -37,7 +37,7 @@ export const gql = async (
 
   let response: Response;
   try {
-    response = await fetch(`${base.replace(/\/+$/, '')}/graphql`, {
+    response = await fetch(`${base.replace(/\/+$/, '')}/${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,6 +66,18 @@ export const gql = async (
   }
   return json.data ?? {};
 };
+
+/** Sends one raw GraphQL request to the workspace and returns `data`. */
+export const gql = async (
+  query: string,
+  variables: Record<string, unknown> = {},
+): Promise<Record<string, any>> => postGraphql('graphql', query, variables);
+
+/** Sends one raw GraphQL request to the metadata API (currentUser and similar). */
+export const metadataGql = async (
+  query: string,
+  variables: Record<string, unknown> = {},
+): Promise<Record<string, any>> => postGraphql('metadata', query, variables);
 
 // ───────────────────────── enum marker ────────────────────────────
 

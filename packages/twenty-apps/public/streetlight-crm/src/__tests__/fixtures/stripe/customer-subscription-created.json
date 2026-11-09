@@ -1,0 +1,55 @@
+{
+  "id": "evt_test_6",
+  "object": "event",
+  "api_version": "2026-10-28.endive",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "customer.subscription.created",
+  "data": {
+    "object": {
+      "id": "sub_test_1",
+      "object": "subscription",
+      "status": "active",
+      "customer": "cus_test_sub",
+      "currency": "usd",
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "ended_at": null,
+      "start_date": 1793899900,
+      "latest_invoice": "in_test_1",
+      "default_payment_method": "pm_test_1",
+      "metadata": {
+        "lp_slug": "give",
+        "invite_code": "abc123"
+      },
+      "items": {
+        "object": "list",
+        "has_more": false,
+        "data": [
+          {
+            "id": "si_test_1",
+            "object": "subscription_item",
+            "current_period_start": 1793899900,
+            "current_period_end": 1796491900,
+            "quantity": 1,
+            "price": {
+              "id": "price_test_1",
+              "object": "price",
+              "currency": "usd",
+              "unit_amount": 2500,
+              "recurring": {
+                "interval": "month",
+                "interval_count": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

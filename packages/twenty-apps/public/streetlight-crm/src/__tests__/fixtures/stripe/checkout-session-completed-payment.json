@@ -1,0 +1,54 @@
+{
+  "id": "evt_test_1",
+  "object": "event",
+  "api_version": "2026-10-28.endive",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_pay",
+      "object": "checkout.session",
+      "mode": "payment",
+      "status": "complete",
+      "payment_status": "paid",
+      "currency": "usd",
+      "amount_total": 5000,
+      "amount_subtotal": 5000,
+      "customer": "cus_test_pay",
+      "customer_creation": "always",
+      "customer_details": {
+        "email": "donor@example.com",
+        "name": "Test Donor",
+        "phone": null,
+        "address": {
+          "line1": "1 Main St",
+          "line2": null,
+          "city": "Austin",
+          "state": "TX",
+          "postal_code": "78701",
+          "country": "US"
+        }
+      },
+      "customer_email": null,
+      "client_reference_id": null,
+      "payment_intent": "pi_test_1",
+      "subscription": null,
+      "payment_link": null,
+      "success_url": "https://crm.example.com/lp/give/thanks?session_id={CHECKOUT_SESSION_ID}",
+      "metadata": {
+        "lp_slug": "give",
+        "invite_code": "abc123",
+        "utm_source": "newsletter",
+        "utm_medium": "email",
+        "utm_campaign": "fall"
+      },
+      "created": 1793899900
+    }
+  }
+}

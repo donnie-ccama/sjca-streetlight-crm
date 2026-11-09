@@ -1,0 +1,55 @@
+{
+  "id": "evt_test_async_fail",
+  "object": "event",
+  "api_version": "2025-08-27.basil",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "checkout.session.async_payment_failed",
+  "data": {
+    "object": {
+      "id": "cs_test_ach",
+      "object": "checkout.session",
+      "mode": "payment",
+      "status": "complete",
+      "payment_status": "unpaid",
+      "currency": "usd",
+      "amount_total": 5000,
+      "amount_subtotal": 5000,
+      "customer": "cus_test_ach",
+      "customer_creation": "always",
+      "customer_details": {
+        "email": "ach-donor@example.com",
+        "name": "Bank Donor",
+        "phone": null,
+        "address": {
+          "line1": "1 Main St",
+          "line2": null,
+          "city": "Austin",
+          "state": "TX",
+          "postal_code": "78701",
+          "country": "US"
+        }
+      },
+      "customer_email": null,
+      "client_reference_id": null,
+      "payment_intent": "pi_test_ach",
+      "subscription": null,
+      "payment_link": null,
+      "success_url": "https://crm.example.com/lp/give/thanks?session_id={CHECKOUT_SESSION_ID}",
+      "metadata": {
+        "lp_slug": "give",
+        "invite_code": "abc123",
+        "utm_source": "newsletter",
+        "utm_medium": "email",
+        "utm_campaign": "fall"
+      },
+      "created": 1793899900,
+      "payment_method_types": ["us_bank_account"]
+    }
+  }
+}

@@ -27,4 +27,13 @@ describe('application identifiers', () => {
     expect(logo).toContain('#1b2b4b');
     expect(logo).toContain('#ff4d47');
   });
+
+  it('declares the Stripe giving variables', () => {
+    const variables = applicationConfig.config.applicationVariables ?? {};
+
+    expect(variables.STRIPE_SECRET_KEY?.isSecret).toBe(true);
+    expect(variables.STRIPE_WEBHOOK_SECRET?.isSecret).toBe(true);
+    expect(variables.GIVING_CONTACT_EMAIL).toMatchObject({ value: '' });
+    expect(variables.GIVING_CONTACT_EMAIL?.isSecret).not.toBe(true);
+  });
 });

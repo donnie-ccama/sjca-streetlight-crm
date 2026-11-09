@@ -33,6 +33,13 @@ import {
   PLEDGE_STATUS_FIELD_ID,
   PLEDGE_TOTAL_AMOUNT_FIELD_ID,
 } from 'src/constants/donor-identifiers';
+import {
+  LANDING_PAGE_OBJECT_ID,
+  LANDING_PAGE_PLEDGES_FIELD_ID,
+  PLEDGE_LANDING_PAGE_FIELD_ID,
+  PLEDGE_MADE_MONTHLY_FROM_ONE_TIME_FIELD_ID,
+  PLEDGE_STRIPE_SUBSCRIPTION_ID_FIELD_ID,
+} from 'src/constants/marketing-identifiers';
 
 export default defineObject({
   universalIdentifier: PLEDGE_OBJECT_ID,
@@ -88,7 +95,12 @@ export default defineObject({
       icon: 'IconRepeat',
       options: [
         { value: 'MONTHLY', label: 'Monthly', position: 0, color: 'blue' },
-        { value: 'QUARTERLY', label: 'Quarterly', position: 1, color: 'purple' },
+        {
+          value: 'QUARTERLY',
+          label: 'Quarterly',
+          position: 1,
+          color: 'purple',
+        },
         {
           value: 'SEMI_ANNUAL',
           label: 'Semi-Annual',
@@ -124,7 +136,12 @@ export default defineObject({
       defaultValue: "'PLEDGE'",
       options: [
         { value: 'PLEDGE', label: 'Pledge', position: 0, color: 'blue' },
-        { value: 'RECURRING', label: 'Recurring Gift', position: 1, color: 'green' },
+        {
+          value: 'RECURRING',
+          label: 'Recurring Gift',
+          position: 1,
+          color: 'green',
+        },
       ],
     },
     {
@@ -157,7 +174,12 @@ export default defineObject({
           position: 0,
           color: 'green',
         },
-        { value: 'CARD_EXPIRED', label: 'Card Expired', position: 1, color: 'orange' },
+        {
+          value: 'CARD_EXPIRED',
+          label: 'Card Expired',
+          position: 1,
+          color: 'orange',
+        },
         {
           value: 'FINANCIAL_DIFFICULTY',
           label: 'Financial Difficulty',
@@ -238,6 +260,42 @@ export default defineObject({
         onDelete: OnDeleteAction.SET_NULL,
         joinColumnName: 'fundId',
       },
+    },
+    {
+      universalIdentifier: PLEDGE_STRIPE_SUBSCRIPTION_ID_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'stripeSubscriptionId',
+      label: 'Stripe Subscription ID',
+      description: 'Links a monthly gift to its Stripe subscription',
+      icon: 'IconBrandStripe',
+      isNullable: true,
+      isUnique: true,
+    },
+    {
+      universalIdentifier: PLEDGE_LANDING_PAGE_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'landingPage',
+      label: 'Landing Page',
+      description: 'The page this monthly gift started on',
+      icon: 'IconWorld',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: LANDING_PAGE_OBJECT_ID,
+      relationTargetFieldMetadataUniversalIdentifier:
+        LANDING_PAGE_PLEDGES_FIELD_ID,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'landingPageId',
+      },
+    },
+    {
+      universalIdentifier: PLEDGE_MADE_MONTHLY_FROM_ONE_TIME_FIELD_ID,
+      type: FieldType.BOOLEAN,
+      name: 'madeMonthlyFromOneTime',
+      label: 'Made Monthly From One-Time Gift',
+      description: 'True when the donor turned a one-time gift into this plan',
+      icon: 'IconRepeat',
+      defaultValue: false,
     },
     {
       universalIdentifier: PLEDGE_DONATIONS_FIELD_ID,

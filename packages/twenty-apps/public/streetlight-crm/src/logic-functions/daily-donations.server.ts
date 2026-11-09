@@ -5,8 +5,8 @@
 // Raw GraphQL over fetch, mirroring export-dashboard-report: the generated
 // CoreApiClient schema omits workspace-owned custom objects (donations,
 // funds, fundraisingCampaigns), so typed queries reject those fields.
-// Mutation variable typing ($data: CreateDonationInput!) follows the exact
-// pattern proven against this workspace by scripts/bootstrap-dashboard.py.
+// Workspace create inputs are named <Object>CreateInput (DonationCreateInput),
+// matching tools/streetlight/workspace-provisioning/bootstrap-dashboard.py.
 
 import {
   buildDonationCreateVariables,
@@ -88,7 +88,7 @@ const createOneEntry = async (
   }
 
   const createData = await gql(
-    `mutation ($data: CreateDonationInput!) {
+    `mutation ($data: DonationCreateInput!) {
       createDonation(data: $data) { id }
     }`,
     buildDonationCreateVariables(entry),
@@ -104,7 +104,7 @@ const createOneEntry = async (
   // no rollup math is needed here.
   if (entry.personId) {
     await gql(
-      `mutation ($data: CreateDonationCreditInput!) {
+      `mutation ($data: DonationCreditCreateInput!) {
         createDonationCredit(data: $data) { id }
       }`,
       buildHardCreditCreateVariables(entry, donationId),

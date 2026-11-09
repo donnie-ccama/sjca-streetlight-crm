@@ -1,0 +1,37 @@
+{
+  "id": "evt_test_inv_one_off",
+  "object": "event",
+  "api_version": "2025-08-27.basil",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.paid",
+  "data": {
+    "object": {
+      "id": "in_test_one_off",
+      "object": "invoice",
+      "status": "paid",
+      "currency": "usd",
+      "amount_due": 2500,
+      "amount_paid": 2500,
+      "billing_reason": "manual",
+      "customer": "cus_test_one_off",
+      "customer_email": "invoice-donor@example.com",
+      "created": 1793899950,
+      "parent": null,
+      "payments": null,
+      "lines": {
+        "object": "list",
+        "has_more": false,
+        "data": []
+      },
+      "status_transitions": {
+        "paid_at": 1793899990
+      }
+    }
+  }
+}

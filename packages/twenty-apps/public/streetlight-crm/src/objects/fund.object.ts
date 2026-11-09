@@ -14,6 +14,11 @@ import {
   PLEDGE_FUND_FIELD_ID,
   PLEDGE_OBJECT_ID,
 } from 'src/constants/donor-identifiers';
+import {
+  FUND_LANDING_PAGES_FIELD_ID,
+  LANDING_PAGE_FUND_FIELD_ID,
+  LANDING_PAGE_OBJECT_ID,
+} from 'src/constants/marketing-identifiers';
 
 export default defineObject({
   universalIdentifier: FUND_OBJECT_ID,
@@ -95,6 +100,17 @@ export default defineObject({
       icon: 'IconCalendarDollar',
       relationTargetObjectMetadataUniversalIdentifier: PLEDGE_OBJECT_ID,
       relationTargetFieldMetadataUniversalIdentifier: PLEDGE_FUND_FIELD_ID,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
+    {
+      universalIdentifier: FUND_LANDING_PAGES_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'landingPages',
+      label: 'Landing Pages',
+      icon: 'IconWorld',
+      relationTargetObjectMetadataUniversalIdentifier: LANDING_PAGE_OBJECT_ID,
+      relationTargetFieldMetadataUniversalIdentifier:
+        LANDING_PAGE_FUND_FIELD_ID,
       universalSettings: { relationType: RelationType.ONE_TO_MANY },
     },
   ],

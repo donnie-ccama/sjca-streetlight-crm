@@ -1,0 +1,29 @@
+{
+  "id": "evt_test_5",
+  "object": "event",
+  "api_version": "2026-10-28.endive",
+  "created": 1793900000,
+  "livemode": false,
+  "pending_webhooks": 1,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.refunded",
+  "data": {
+    "object": {
+      "id": "ch_test_1",
+      "object": "charge",
+      "amount": 5000,
+      "amount_refunded": 5000,
+      "refunded": true,
+      "currency": "usd",
+      "payment_intent": "pi_test_1",
+      "customer": "cus_test_pay",
+      "billing_details": {
+        "email": "donor@example.com"
+      },
+      "metadata": {}
+    }
+  }
+}
